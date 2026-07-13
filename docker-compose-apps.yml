@@ -1,0 +1,123 @@
+x-app-env: &app-env
+  REGISTER_HOST: ${REGISTER_HOST:-rnacos}
+  REGISTER_PORT: ${REGISTER_PORT:-8848}
+  REDIS_HOST: ${REDIS_HOST:-redis}
+  REDIS_PORT: ${REDIS_PORT:-6379}
+  DATASOURCE_DBTYPE: ${DATASOURCE_DBTYPE:-mysql}
+  DATASOURCE_HOST: ${DATASOURCE_HOST:-mysql}
+  DATASOURCE_PORT: ${DATASOURCE_PORT:-3306}
+  DATASOURCE_USERNAME: ${DATASOURCE_USERNAME:-opensabre}
+  DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-opensabre_change_me}
+  RABBIT_MQ_HOST: ${RABBIT_MQ_HOST:-rabbitmq}
+  RABBIT_MQ_PORT: ${RABBIT_MQ_PORT:-5672}
+  RABBIT_MQ_USERNAME: ${RABBIT_MQ_USERNAME:-opensabre}
+  RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD:-opensabre_change_me}
+  SENTINEL_DASHBOARD_HOST: ${SENTINEL_DASHBOARD_HOST:-sentinel-dashboard}
+  SENTINEL_DASHBOARD_PORT: ${SENTINEL_DASHBOARD_PORT:-8858}
+  AUTH_ISSUER_URI: ${AUTH_ISSUER_URI:-http://base-authorization:8000}
+  GATEWAY_REDIRECT_URI: ${GATEWAY_REDIRECT_URI:-http://localhost:8443/login/oauth2/code/base-gateway-client}
+  GATEWAY_OAUTH_CLIENT_ID: ${GATEWAY_OAUTH_CLIENT_ID:-test_client1}
+  GATEWAY_OAUTH_CLIENT_SECRET: ${GATEWAY_OAUTH_CLIENT_SECRET:-test_client1}
+  NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
+  HOME: ${CONTAINER_HOME:-/app}
+
+x-app-volumes: &app-volumes
+  - ./config/bootstrap.yml:/app/bootstrap.yml:ro
+  - ./config/application.yml:/app/config/application.yml:ro
+
+services:
+  base-authorization:
+    image: ${BASE_AUTHORIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-authorization:latest}
+    container_name: base-authorization
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      SERVER_PORT: 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config/bootstrap.yml:/app/bootstrap.yml:ro
+      - ./config/application.yml:/app/config/application.yml:ro
+      - ./logs/base-authorization:/app/logs
+    networks:
+      opensabre:
+        aliases:
+          - authorization
+
+  base-organization:
+    image: ${BASE_ORGANIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-organization:latest}
+    container_name: base-organization
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      SERVER_PORT: 8010
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./config/bootstrap.yml:/app/bootstrap.yml:ro
+      - ./config/application.yml:/app/config/application.yml:ro
+      - ./logs/base-organization:/app/logs
+    networks:
+      - opensabre
+
+  base-sysadmin:
+    image: ${BASE_SYSADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-sysadmin:latest}
+    container_name: base-sysadmin
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      SERVER_PORT: 8020
+    ports:
+      - "8020:8020"
+    volumes:
+      - ./config/bootstrap.yml:/app/bootstrap.yml:ro
+      - ./config/application.yml:/app/config/application.yml:ro
+      - ./logs/base-sysadmin:/app/logs
+    networks:
+      - opensabre
+
+  base-gateway:
+    image: ${BASE_GATEWAY_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-gateway:latest}
+    container_name: base-gateway
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      SERVER_PORT: 8443
+    ports:
+      - "443:8443"
+    extra_hosts:
+      - "opensabre:10.0.10.4"
+    volumes:
+      - ./config/bootstrap.yml:/app/bootstrap.yml:ro
+      - ./config/base-gateway.yml:/app/resources/base-gateway.yml:ro
+      - ./logs/base-gateway:/app/logs
+    depends_on:
+      base-authorization:
+        condition: service_started
+      base-organization:
+        condition: service_started
+      base-sysadmin:
+        condition: service_started
+    networks:
+      opensabre:
+        aliases:
+          - gateway
+
+  opensabre-admin:
+    image: ${OPENSABRE_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/opensabre-admin:master}
+    container_name: opensabre-admin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./config/opensabre-admin-nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      base-gateway:
+        condition: service_started
+    networks:
+      - opensabre
+
+networks:
+  opensabre:
+    name: opensabre
+    driver: bridge

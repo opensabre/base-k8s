@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${REGISTER_HOST:rnacos}:${REGISTER_PORT:8848}
+        # Leave empty on a single Docker host so RNacos registers the container
+        # address. Set NACOS_DISCOVERY_IP to the host/private IP when clients
+        # outside the compose network must call registered instances directly.
+        ip: ${NACOS_DISCOVERY_IP:}
+      config:
+        server-addr: ${REGISTER_HOST:rnacos}:${REGISTER_PORT:8848}
+        file-extension: yml

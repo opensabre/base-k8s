@@ -1,0 +1,105 @@
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.0}
+    container_name: opensabre-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_change_me}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-opensabre}
+      MYSQL_USER: ${DATASOURCE_USERNAME:-opensabre}
+      MYSQL_PASSWORD: ${DATASOURCE_PASSWORD:-opensabre_change_me}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./initdb/10-opensabre-init.sh:/docker-entrypoint-initdb.d/10-opensabre-init.sh:ro
+      - ./initdb/sql/base-authorization:/opt/opensabre/sql/base-authorization:ro
+      - ./initdb/sql/base-organization:/opt/opensabre/sql/base-organization:ro
+      - ./initdb/sql/base-sysadmin:/opt/opensabre/sql/base-sysadmin:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks:
+      - opensabre
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:7-alpine}
+    container_name: opensabre-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks:
+      - opensabre
+
+  rnacos:
+    image: ${RNACOS_IMAGE:-qingpan/rnacos:stable}
+    container_name: opensabre-rnacos
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "10848:10848"
+    volumes:
+      - rnacos-data:/io
+    networks:
+      opensabre:
+        aliases:
+          - nacos
+
+  rabbitmq:
+    image: ${RABBITMQ_IMAGE:-rabbitmq:3.13-management-alpine}
+    container_name: opensabre-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-opensabre}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-opensabre_change_me}
+      TZ: Asia/Shanghai
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks:
+      - opensabre
+
+  sentinel-dashboard:
+    image: ${SENTINEL_DASHBOARD_IMAGE:-bladex/sentinel-dashboard:1.8.8}
+    container_name: opensabre-sentinel-dashboard
+    restart: unless-stopped
+    ports:
+      - "8858:8858"
+    networks:
+      - opensabre
+
+networks:
+  opensabre:
+    name: opensabre
+    driver: bridge
+
+volumes:
+  mysql-data:
+  redis-data:
+  rnacos-data:
+  rabbitmq-data:

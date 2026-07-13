@@ -1,0 +1,64 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: base-authorization-api-docs
+          uri: lb://base-authorization
+          predicates:
+            - Path=/oauth2/v3/**
+          filters:
+            - StripPrefix=2
+        - id: base-authorization
+          uri: lb://base-authorization
+          predicates:
+            - Path=/oauth2/**,/login,/assets/**,/webjars/**
+        - id: base-authorization-api
+          uri: lb://base-authorization
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=2
+        - id: base-organization
+          uri: lb://base-organization
+          predicates:
+            - Path=/api/org/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=2
+        - id: base-sysadmin
+          uri: lb://base-sysadmin
+          predicates:
+            - Path=/api/sysadmin/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=2
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_ISSUER_URI:http://base-authorization:8000}
+      client:
+        provider:
+          custom-issuer:
+            issuer-uri: ${AUTH_ISSUER_URI:http://base-authorization:8000}
+            user-info-uri: ${AUTH_ISSUER_URI:http://base-authorization:8000}/userinfo
+            user-name-attribute: name
+        registration:
+          base-gateway-client:
+            provider: custom-issuer
+            client-name: 用户登陆
+            client-id: ${GATEWAY_OAUTH_CLIENT_ID:test_client1}
+            client-secret: ${GATEWAY_OAUTH_CLIENT_SECRET:test_client1}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: ${GATEWAY_REDIRECT_URI:http://localhost:8443/login/oauth2/code/base-gateway-client}
+            scope:
+              - read
+              - openid
+              - profile
+opensabre:
+  gateway:
+    # 网关白名单，无需要签权path
+    permit:
+      paths: /v3/**,/webjars/**,/assets/**,/doc.html,/favicon.ico,/oauth2/**,/api/sysadmin/captcha/send/image

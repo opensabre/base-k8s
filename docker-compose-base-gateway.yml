@@ -1,0 +1,40 @@
+services:
+  base-gateway:
+    image: ${BASE_GATEWAY_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-gateway:latest}
+    container_name: base-gateway
+    restart: always
+    ports:
+      - "443:8443"
+    extra_hosts:
+      - "opensabre:10.0.10.4"
+    environment:
+      REGISTER_HOST: ${REGISTER_HOST:-rnacos}
+      REGISTER_PORT: ${REGISTER_PORT:-8848}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      DATASOURCE_DBTYPE: ${DATASOURCE_DBTYPE:-mysql}
+      DATASOURCE_HOST: ${DATASOURCE_HOST:-mysql}
+      DATASOURCE_PORT: ${DATASOURCE_PORT:-3306}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME:-opensabre}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-opensabre_change_me}
+      SENTINEL_DASHBOARD_HOST: ${SENTINEL_DASHBOARD_HOST:-sentinel-dashboard}
+      SENTINEL_DASHBOARD_PORT: ${SENTINEL_DASHBOARD_PORT:-8858}
+      AUTH_ISSUER_URI: ${AUTH_ISSUER_URI:-http://base-authorization:8000}
+      GATEWAY_REDIRECT_URI: ${GATEWAY_REDIRECT_URI:-http://localhost:8443/login/oauth2/code/base-gateway-client}
+      GATEWAY_OAUTH_CLIENT_ID: ${GATEWAY_OAUTH_CLIENT_ID:-test_client1}
+      GATEWAY_OAUTH_CLIENT_SECRET: ${GATEWAY_OAUTH_CLIENT_SECRET:-test_client1}
+      NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
+      HOME: ${CONTAINER_HOME:-/app}
+    volumes:
+      - ./config/bootstrap.yml:/app/bootstrap.yml:ro
+      - ./config/base-gateway.yml:/app/resources/base-gateway.yml:ro
+      - ./logs/base-gateway:/app/logs
+    networks:
+      opensabre:
+        aliases:
+          - gateway
+
+networks:
+  opensabre:
+    name: opensabre
+    external: true

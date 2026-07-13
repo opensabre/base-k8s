@@ -1,0 +1,3 @@
+opensabre:
+  oauth2:
+    issuer-uri: ${AUTH_ISSUER_URI:http://base-authorization:8000}
