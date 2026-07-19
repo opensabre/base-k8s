@@ -220,7 +220,8 @@ VALUES (101, '新增用户', 'user_manager:btn_add', 'user', '/user', 'POST', '�
        (315, '删除网关路由', 'resource_manager:adel', 'resource', '/resource/{id}', 'DELETE', '删除资源', now(), now(), 'system', 'system'),
        (316, '查看网关路由', 'resource_manager:view', 'resource', '/resource/{id}', 'GET', '查看资源', now(), now(), 'system', 'system'),
        (317, '搜索网关路由', 'resource_manager:query', 'resource', '/resource/conditions', 'POST', '搜索资源', now(), now(), 'system', 'system'),
-       (318, '全局加载路由', 'resource_manager:all', 'resource', '/resource/all', 'GET', '查询全部资源', now(), now(), 'system', 'system');
+       (318, '全局加载路由', 'resource_manager:all', 'resource', '/resource/all', 'GET', '查询全部资源', now(), now(), 'system', 'system'),
+       (323, '发布网关 OAuth2 认证方式', 'gateway:oauth2-client:update', 'gateway', '/gateway/routes/oauth2-clients', 'PUT', '更新并发布网关 OAuth2/OIDC 登录认证方式', now(), now(), 'system', 'system');
 
 -- 用户关系授权
 INSERT INTO base_org_user_role (id, user_id, role_id, created_time, updated_time, created_by, updated_by)
@@ -243,6 +244,8 @@ VALUES (101, 101, 101, now(), now(), 'system', 'system'),
        (206, 101, 206, now(), now(), 'system', 'system'),
        (207, 101, 207, now(), now(), 'system', 'system'),
        (208, 101, 301, now(), now(), 'system', 'system'),
+       (520, 101, 323, now(), now(), 'system', 'system'),
+       (521, 103, 323, now(), now(), 'system', 'system'),
        (209, 101, 302, now(), now(), 'system', 'system'),
        (210, 101, 303, now(), now(), 'system', 'system'),
        (211, 101, 304, now(), now(), 'system', 'system'),
@@ -293,6 +296,8 @@ VALUES (101, -1, 'MENU', '/admin', 'setting', '基础管理', '用户，角色�
        (114, 109, 'MENU', '/sysadmin/captcha-scenes', 'captcha', '验证码管理', '{"routeName":"CaptchaScenes","component":"sysadmin/captcha-scenes/index","visible":1}', 40, now(), now(), 'system', 'system'),
        (115, 109, 'MENU', '/sysadmin/notification', 'bell', '通知管理', '{"routeName":"NotificationAdmin","component":"sysadmin/notification/index","visible":1}', 50, now(), now(), 'system', 'system'),
        (116, 109, 'MENU', '/sysadmin/online-user', 'user', '在线用户', '{"routeName":"OnlineUser","component":"security/online-user/index","visible":1}', 60, now(), now(), 'system', 'system');
+       (120, 109, 'MENU', '/sysadmin/gateway-routes', 'api', '网关路由', '{"routeName":"GatewayRoute","component":"system/gateway-route/index","visible":1}', 60, now(), now(), 'system', 'system'),
+       (159, 120, 'BUTTON', '', '', '发布 OAuth2 认证方式', '{"perm":"gateway:oauth2-client:update"}', 4, now(), now(), 'system', 'system'),
 
 INSERT INTO base_org_user_group (id, user_id, group_id, created_time, updated_time, created_by, updated_by)
 VALUES (101, 101, 101, now(), now(), 'system', 'system'),
@@ -335,4 +340,8 @@ VALUES (101, 101, 101, now(), now(), 'system', 'system'),
        (131, 103, 114, now(), now(), 'system', 'system'),
        (132, 103, 115, now(), now(), 'system', 'system'),
        (133, 101, 116, now(), now(), 'system', 'system'),
-       (134, 103, 116, now(), now(), 'system', 'system');
+       (134, 103, 116, now(), now(), 'system', 'system'),
+       (137, 101, 120, now(), now(), 'system', 'system'),
+       (138, 103, 120, now(), now(), 'system', 'system'),
+       (101159, 101, 159, now(), now(), 'system', 'system'),
+       (103159, 103, 159, now(), now(), 'system', 'system');

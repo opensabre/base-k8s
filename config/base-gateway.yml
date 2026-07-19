@@ -52,7 +52,19 @@ spring:
             client-secret: ${GATEWAY_OAUTH_CLIENT_SECRET:test_client1}
             client-authentication-method: client_secret_basic
             authorization-grant-type: authorization_code
-            redirect-uri: ${GATEWAY_REDIRECT_URI:http://localhost:8443/login/oauth2/code/base-gateway-client}
+            redirect-uri: ${GATEWAY_REDIRECT_URI:http://opensabre:8080/login/oauth2/code/base-gateway-client}
+            scope:
+              - read
+              - openid
+              - profile
+          base-gateway-local:
+            provider: custom-issuer
+            client-name: 本地用户登陆
+            client-id: ${GATEWAY_LOCAL_OAUTH_CLIENT_ID:base-gateway-local}
+            client-secret: ${GATEWAY_LOCAL_OAUTH_CLIENT_SECRET:base-gateway-local}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: ${GATEWAY_LOCAL_REDIRECT_URI:http://localhost:3000/login/oauth2/code/base-gateway-client}
             scope:
               - read
               - openid
@@ -62,3 +74,6 @@ opensabre:
     # 网关白名单，无需要签权path
     permit:
       paths: /v3/**,/webjars/**,/assets/**,/doc.html,/favicon.ico,/oauth2/**,/api/sysadmin/captcha/send/image
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
