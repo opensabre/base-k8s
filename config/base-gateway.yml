@@ -2,6 +2,12 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: base-gateway-admin-api
+          uri: lb://base-gateway-admin
+          predicates:
+            - Path=/api/gateway-admin/**
+          filters:
+            - StripPrefix=2
         - id: base-authorization-api-docs
           uri: lb://base-authorization
           predicates:
