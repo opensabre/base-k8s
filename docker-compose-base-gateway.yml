@@ -26,7 +26,7 @@ services:
       GATEWAY_OAUTH_CLIENT_SECRET: ${GATEWAY_OAUTH_CLIENT_SECRET:-test_client1}
       GATEWAY_LOCAL_OAUTH_CLIENT_ID: ${GATEWAY_LOCAL_OAUTH_CLIENT_ID:-base-gateway-local}
       GATEWAY_LOCAL_OAUTH_CLIENT_SECRET: ${GATEWAY_LOCAL_OAUTH_CLIENT_SECRET:-base-gateway-local}
-      GATEWAY_LOCAL_REDIRECT_URI: ${GATEWAY_LOCAL_REDIRECT_URI:-http://localhost:3000/login/oauth2/code/base-gateway-client}
+      GATEWAY_LOCAL_REDIRECT_URI: ${GATEWAY_LOCAL_REDIRECT_URI:-http://localhost:3000/login/oauth2/code/base-gateway-local}
       NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
       HOME: ${CONTAINER_HOME:-/app}
     volumes:
