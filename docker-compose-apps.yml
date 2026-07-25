@@ -15,6 +15,7 @@ x-app-env: &app-env
   SENTINEL_DASHBOARD_HOST: ${SENTINEL_DASHBOARD_HOST:-sentinel-dashboard}
   SENTINEL_DASHBOARD_PORT: ${SENTINEL_DASHBOARD_PORT:-8858}
   AUTH_ISSUER_URI: ${AUTH_ISSUER_URI:-http://base-authorization:8000}
+  AUTH_JWK_SET_URI: ${AUTH_JWK_SET_URI:-http://base-authorization:8000/oauth2/jwks}
   GATEWAY_REDIRECT_URI: ${GATEWAY_REDIRECT_URI:-http://localhost:8443/login/oauth2/code/base-gateway-client}
   GATEWAY_OAUTH_CLIENT_ID: ${GATEWAY_OAUTH_CLIENT_ID:-test_client1}
   GATEWAY_OAUTH_CLIENT_SECRET: ${GATEWAY_OAUTH_CLIENT_SECRET:-test_client1}
@@ -69,6 +70,7 @@ services:
     environment:
       <<: *app-env
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?JASYPT_ENCRYPTOR_PASSWORD is required}
+      INTERNAL_TOKEN_KEY_WRITE_ENABLED: ${INTERNAL_TOKEN_KEY_WRITE_ENABLED:-false}
       # CI 镜像以非 root 用户运行，将 Nacos Client 日志写入已挂载的应用日志目录。
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs}
       SERVER_PORT: 8020
