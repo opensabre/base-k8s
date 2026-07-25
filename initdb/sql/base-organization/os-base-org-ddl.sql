@@ -295,9 +295,12 @@ VALUES (101, -1, 'MENU', '/admin', 'setting', '基础管理', '用户，角色�
        (113, 109, 'MENU', '/sysadmin/dict-items', 'dict', '字典项', '{"routeName":"DictItem","component":"system/dict/dict-item","visible":0}', 30, now(), now(), 'system', 'system'),
        (114, 109, 'MENU', '/sysadmin/captcha-scenes', 'captcha', '验证码管理', '{"routeName":"CaptchaScenes","component":"sysadmin/captcha-scenes/index","visible":1}', 40, now(), now(), 'system', 'system'),
        (115, 109, 'MENU', '/sysadmin/notification', 'bell', '通知管理', '{"routeName":"NotificationAdmin","component":"sysadmin/notification/index","visible":1}', 50, now(), now(), 'system', 'system'),
-       (116, 109, 'MENU', '/sysadmin/online-user', 'user', '在线用户', '{"routeName":"OnlineUser","component":"security/online-user/index","visible":1}', 60, now(), now(), 'system', 'system');
+       (116, 109, 'MENU', '/sysadmin/online-user', 'user', '在线用户', '{"routeName":"OnlineUser","component":"security/online-user/index","visible":1}', 60, now(), now(), 'system', 'system'),
        (120, 109, 'MENU', '/sysadmin/gateway-routes', 'api', '网关路由', '{"routeName":"GatewayRoute","component":"system/gateway-route/index","visible":1}', 60, now(), now(), 'system', 'system'),
        (159, 120, 'BUTTON', '', '', '发布 OAuth2 认证方式', '{"perm":"gateway:oauth2-client:update"}', 4, now(), now(), 'system', 'system'),
+       (220, 109, 'MENU', '/sysadmin/internal-token-keys', 'lock', '内部 Token 密钥', '{"routeName":"InternalTokenKeys","component":"sysadmin/internal-token-keys/index","visible":1}', 75, now(), now(), 'system', 'system'),
+       (221, 220, 'BUTTON', '', '', '轮换内部 Token 密钥', '{"perm":"sysadmin:internal-token-key:rotate"}', 1, now(), now(), 'system', 'system'),
+       (222, 220, 'BUTTON', '', '', '退役 previous 密钥', '{"perm":"sysadmin:internal-token-key:retire"}', 2, now(), now(), 'system', 'system');
 
 INSERT INTO base_org_user_group (id, user_id, group_id, created_time, updated_time, created_by, updated_by)
 VALUES (101, 101, 101, now(), now(), 'system', 'system'),
@@ -344,4 +347,7 @@ VALUES (101, 101, 101, now(), now(), 'system', 'system'),
        (137, 101, 120, now(), now(), 'system', 'system'),
        (138, 103, 120, now(), now(), 'system', 'system'),
        (101159, 101, 159, now(), now(), 'system', 'system'),
-       (103159, 103, 159, now(), now(), 'system', 'system');
+       (103159, 103, 159, now(), now(), 'system', 'system'),
+       (201220, 101, 220, now(), now(), 'system', 'system'),
+       (201221, 101, 221, now(), now(), 'system', 'system'),
+       (201222, 101, 222, now(), now(), 'system', 'system');
