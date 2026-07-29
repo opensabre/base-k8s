@@ -1,0 +1,31 @@
+services:
+  base-gateway-admin:
+    image: ${BASE_GATEWAY_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-gateway-admin:latest}
+    container_name: base-gateway-admin
+    restart: unless-stopped
+    ports:
+      - "8030:8030"
+    environment:
+      SERVER_PORT: 8030
+      REGISTER_HOST: ${REGISTER_HOST:-rnacos}
+      REGISTER_PORT: ${REGISTER_PORT:-8848}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      DATASOURCE_DBTYPE: ${DATASOURCE_DBTYPE:-mysql}
+      DATASOURCE_HOST: ${DATASOURCE_HOST:-mysql}
+      DATASOURCE_PORT: ${DATASOURCE_PORT:-3306}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME:-opensabre}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-opensabre_change_me}
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?JASYPT_ENCRYPTOR_PASSWORD is required}
+      GATEWAY_CONFIGURATION_WRITE_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs/csp}
+    volumes:
+      - ./config/bootstrap.yml:/app/bootstrap.yml:ro
+      - ./logs/base-gateway-admin:/app/logs
+    networks:
+      - opensabre
+
+networks:
+  opensabre:
+    name: opensabre
+    external: true
