@@ -18,6 +18,8 @@ x-app-env: &app-env
   GATEWAY_REDIRECT_URI: ${GATEWAY_REDIRECT_URI:-http://localhost:8443/login/oauth2/code/base-gateway-client}
   GATEWAY_OAUTH_CLIENT_ID: ${GATEWAY_OAUTH_CLIENT_ID:-test_client1}
   GATEWAY_OAUTH_CLIENT_SECRET: ${GATEWAY_OAUTH_CLIENT_SECRET:-test_client1}
+  # 应用启动时向 base-sysadmin 注册错误码快照的共享鉴权令牌。
+  ERROR_CATALOG_REGISTRATION_TOKEN: ${ERROR_CATALOG_REGISTRATION_TOKEN:-}
   NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
   HOME: ${CONTAINER_HOME:-/app}
 
