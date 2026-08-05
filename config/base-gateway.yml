@@ -1,6 +1,9 @@
 spring:
   cloud:
     gateway:
+      # OAuth2 登录态必须中继到所有后端路由；控制面禁止删除该过滤器。
+      default-filters:
+        - TokenRelay=
       routes:
         - id: base-gateway-admin-api
           uri: lb://base-gateway-admin
@@ -23,21 +26,18 @@ spring:
           predicates:
             - Path=/api/auth/**
           filters:
-            - TokenRelay=
             - StripPrefix=2
         - id: base-organization
           uri: lb://base-organization
           predicates:
             - Path=/api/org/**
           filters:
-            - TokenRelay=
             - StripPrefix=2
         - id: base-sysadmin
           uri: lb://base-sysadmin
           predicates:
             - Path=/api/sysadmin/**
           filters:
-            - TokenRelay=
             - StripPrefix=2
   security:
     oauth2:
