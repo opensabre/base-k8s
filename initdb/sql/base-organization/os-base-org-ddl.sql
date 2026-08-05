@@ -298,7 +298,10 @@ VALUES (101, -1, 'MENU', '/admin', 'setting', '基础管理', '用户，角色�
        (119, 109, 'MENU', '/sysadmin/ratelimit-scenes', 'timer', '限次场景', '{"routeName":"RateLimitScenes","component":"sysadmin/ratelimit-scenes/index","visible":1}', 55, now(), now(), 'system', 'system'),
        (120, 109, 'MENU', '/gateway/api-routes', 'api', 'API 路由管理', '{"routeName":"GatewayApiRoutes","component":"system/gateway/api-routes/index","visible":1}', 60, now(), now(), 'system', 'system'),
        (159, 120, 'BUTTON', '', '', '发布 OAuth2 认证方式', '{"perm":"gateway:oauth2-client:update"}', 4, now(), now(), 'system', 'system'),
-       (116, 109, 'MENU', '/sysadmin/online-user', 'user', '在线用户', '{"routeName":"OnlineUser","component":"security/online-user/index","visible":1}', 60, now(), now(), 'system', 'system');
+       (116, 109, 'MENU', '/sysadmin/online-user', 'user', '在线用户', '{"routeName":"OnlineUser","component":"security/online-user/index","visible":1}', 60, now(), now(), 'system', 'system'),
+       (220, 109, 'MENU', '/sysadmin/internal-token-keys', 'lock', '内部 Token 密钥', '{"routeName":"InternalTokenKeys","component":"sysadmin/internal-token-keys/index","visible":1}', 75, now(), now(), 'system', 'system'),
+       (221, 220, 'BUTTON', '', '', '轮换内部 Token 密钥', '{"perm":"sysadmin:internal-token-key:rotate"}', 1, now(), now(), 'system', 'system'),
+       (222, 220, 'BUTTON', '', '', '退役 previous 密钥', '{"perm":"sysadmin:internal-token-key:retire"}', 2, now(), now(), 'system', 'system');
 
 INSERT INTO base_org_user_group (id, user_id, group_id, created_time, updated_time, created_by, updated_by)
 VALUES (101, 101, 101, now(), now(), 'system', 'system'),
@@ -347,4 +350,7 @@ VALUES (101, 101, 101, now(), now(), 'system', 'system'),
        (137, 101, 120, now(), now(), 'system', 'system'),
        (138, 103, 120, now(), now(), 'system', 'system'),
        (101159, 101, 159, now(), now(), 'system', 'system'),
-       (103159, 103, 159, now(), now(), 'system', 'system');
+       (103159, 103, 159, now(), now(), 'system', 'system'),
+       (201220, 101, 220, now(), now(), 'system', 'system'),
+       (201221, 101, 221, now(), now(), 'system', 'system'),
+       (201222, 101, 222, now(), now(), 'system', 'system');

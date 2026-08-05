@@ -1,13 +1,12 @@
 services:
-  base-organization:
-    image: ${BASE_ORGANIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-organization:latest}
-    container_name: base-organization
-    restart: always
+  base-gateway-admin:
+    image: ${BASE_GATEWAY_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-gateway-admin:latest}
+    container_name: base-gateway-admin
+    restart: unless-stopped
     ports:
-      - "8010:8010"
+      - "8030:8030"
     environment:
-      # CI 镜像以非 root 用户运行，将 Nacos Client 日志写入已挂载的应用日志目录。
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs}
+      SERVER_PORT: 8030
       REGISTER_HOST: ${REGISTER_HOST:-rnacos}
       REGISTER_PORT: ${REGISTER_PORT:-8848}
       REDIS_HOST: ${REDIS_HOST:-redis}
@@ -19,11 +18,12 @@ services:
       DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-opensabre_change_me}
       GOVERNANCE_REGISTRATION_TOKEN: ${GOVERNANCE_REGISTRATION_TOKEN:-${ERROR_CATALOG_REGISTRATION_TOKEN:-}}
       ERROR_CATALOG_REGISTRATION_TOKEN: ${ERROR_CATALOG_REGISTRATION_TOKEN:-${GOVERNANCE_REGISTRATION_TOKEN:-}}
-      NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?JASYPT_ENCRYPTOR_PASSWORD is required}
+      GATEWAY_CONFIGURATION_WRITE_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs/csp}
     volumes:
       - ./config/bootstrap.yml:/app/bootstrap.yml:ro
-      - ./config/application.yml:/app/config/application.yml:ro
-      - ./logs/base-organization:/app/logs
+      - ./logs/base-gateway-admin:/app/logs
     networks:
       - opensabre
 

@@ -1,0 +1,9 @@
+# 跨服务、非敏感的运行配置。
+# Nacos 连接信息、基础设施连接信息、密码和令牌仍保留在部署环境或 Secret 中。
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # 使用 Docker 服务名，避免容器内 localhost 回退。
+          jwk-set-uri: http://base-authorization:8000/oauth2/jwks

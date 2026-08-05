@@ -57,6 +57,12 @@ RABBITMQ_DEFAULT_PASS=替换为强密码
 RABBIT_MQ_PASSWORD=替换为强密码
 ```
 
+非敏感的跨服务应用配置由 `config/nacos/` 版本管理并发布到 Nacos；Nacos 地址、基础设施连接信息以及密码、令牌仍保留在 `.env` 或 Secret。发布公共配置：
+
+```bash
+./scripts/publish-nacos-common-config.sh
+```
+
 生产环境建议同时固定所有应用镜像标签，避免默认 `latest` 带来不可重复部署。
 
 3. 启动完整项目群。
