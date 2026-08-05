@@ -11,6 +11,11 @@ spring:
             - Path=/api/gateway-admin/**
           filters:
             - StripPrefix=2
+        # 管理台 Knife4j 根路径文档入口，复用认证服务的 OpenAPI。
+        - id: base-authorization-root-api-docs
+          uri: lb://base-authorization
+          predicates:
+            - Path=/v3/**
         - id: base-authorization-api-docs
           uri: lb://base-authorization
           predicates:
