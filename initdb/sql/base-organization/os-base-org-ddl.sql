@@ -296,7 +296,7 @@ VALUES (101, -1, 'MENU', '/admin', 'setting', '基础管理', '用户，角色�
        (114, 109, 'MENU', '/sysadmin/captcha-scenes', 'captcha', '验证码管理', '{"routeName":"CaptchaScenes","component":"sysadmin/captcha-scenes/index","visible":1}', 40, now(), now(), 'system', 'system'),
        (115, 109, 'MENU', '/sysadmin/notification', 'bell', '通知管理', '{"routeName":"NotificationAdmin","component":"sysadmin/notification/index","visible":1}', 50, now(), now(), 'system', 'system'),
        (119, 109, 'MENU', '/sysadmin/ratelimit-scenes', 'timer', '限次场景', '{"routeName":"RateLimitScenes","component":"sysadmin/ratelimit-scenes/index","visible":1}', 55, now(), now(), 'system', 'system'),
-       (120, 109, 'MENU', '/gateway/api-routes', 'api', 'API 路由管理', '{"routeName":"GatewayApiRoutes","component":"system/gateway/api-routes/index","visible":1}', 60, now(), now(), 'system', 'system'),
+       (120, 109, 'MENU', '/gateway/api-routes', 'api', '路由管理', '{"routeName":"GatewayApiRoutes","component":"system/gateway/api-routes/index","visible":1}', 60, now(), now(), 'system', 'system'),
        (159, 120, 'BUTTON', '', '', '发布 OAuth2 认证方式', '{"perm":"gateway:oauth2-client:update"}', 4, now(), now(), 'system', 'system'),
        (116, 109, 'MENU', '/sysadmin/online-user', 'user', '在线用户', '{"routeName":"OnlineUser","component":"security/online-user/index","visible":1}', 60, now(), now(), 'system', 'system'),
        (220, 109, 'MENU', '/sysadmin/internal-token-keys', 'lock', '内部 Token 密钥', '{"routeName":"InternalTokenKeys","component":"sysadmin/internal-token-keys/index","visible":1}', 75, now(), now(), 'system', 'system'),
