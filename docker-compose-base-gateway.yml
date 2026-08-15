@@ -8,6 +8,7 @@ services:
     extra_hosts:
       - "opensabre:10.0.10.4"
     environment:
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -DJM.SNAPSHOT.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs/csp}
       REGISTER_HOST: ${REGISTER_HOST:-rnacos}
       REGISTER_PORT: ${REGISTER_PORT:-8848}
       REDIS_HOST: ${REDIS_HOST:-redis}
