@@ -7,6 +7,7 @@ services:
       - "8000:8000"
     environment:
       HOME: ${CONTAINER_HOME:-/app}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -DJM.SNAPSHOT.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs/csp}
       REGISTER_HOST: ${REGISTER_HOST:-rnacos}
       REGISTER_PORT: ${REGISTER_PORT:-8848}
       REDIS_HOST: ${REDIS_HOST:-redis}
