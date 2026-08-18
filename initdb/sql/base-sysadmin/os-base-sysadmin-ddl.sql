@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS base_sys_audit_log;
 CREATE TABLE IF NOT EXISTS `base_sys_audit_log` (
     `id` varchar(32) NOT NULL COMMENT '主键ID',
     `operation_type` varchar(50) NOT NULL COMMENT '操作类型',
-    `operation_time` datetime NOT NULL COMMENT '操作时间',
+    `operation_time` datetime(3) NOT NULL COMMENT '操作时间',
     `operator_username` varchar(100) NOT NULL COMMENT '操作人用户名',
     `module` varchar(100) NOT NULL COMMENT '操作模块',
     `description` varchar(500) COMMENT '操作描述',
@@ -19,9 +19,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_audit_log` (
     `error_message` text COMMENT '错误信息',
     `execution_time` bigint COMMENT '执行时间(毫秒)',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY `idx_operator_username` (`operator_username`),
     KEY `idx_operation_time` (`operation_time`)
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_captcha_scene` (
     `max_limit_count` int NOT NULL DEFAULT 100 COMMENT '单用户生成限制次数',
     `enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_scene_code` (`scene_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='验证码场景表';
@@ -63,9 +63,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_ratelimit_scene` (
     `enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
     `description` varchar(255) DEFAULT NULL COMMENT '描述',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_scene_code` (`scene_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='限次场景表';
@@ -80,9 +80,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_notification_scene` (
     `description` varchar(255) DEFAULT NULL COMMENT '描述',
     `enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_scene_code` (`scene_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知场景表';
@@ -98,9 +98,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_notification_template` (
     `sort` int NOT NULL DEFAULT 1 COMMENT '排序',
     `enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_scene_channel` (`scene_code`, `channel`),
     KEY `idx_scene_enabled_sort` (`scene_code`, `enabled`, `sort`)
@@ -122,9 +122,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_notification_record` (
     `next_retry_time` datetime DEFAULT NULL COMMENT '下次重试时间',
     `sent_time` datetime DEFAULT NULL COMMENT '发送时间',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY `idx_scene_channel_status` (`scene_code`, `channel`, `status`),
     KEY `idx_created_time` (`created_time`)
@@ -140,9 +140,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_dict_type` (
     `status` tinyint NOT NULL DEFAULT 1 COMMENT '状态(1:启用;0:禁用)',
     `remark` varchar(255) DEFAULT NULL COMMENT '备注',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_dict_code` (`dict_code`),
     KEY `idx_dict_source_application` (`source_application`),
@@ -158,9 +158,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_dict_item` (
     `sort` int NOT NULL DEFAULT 1 COMMENT '排序',
     `tag_type` varchar(16) NOT NULL DEFAULT 'N' COMMENT '标签类型(N/P/S/W/I/D)',
     `created_by` varchar(100) NOT NULL COMMENT '创建人',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
     `updated_by` varchar(100) NOT NULL COMMENT '更新人',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_dict_value` (`dict_code`, `value`),
     KEY `idx_dict_status_sort` (`dict_code`, `status`, `sort`)
@@ -180,9 +180,9 @@ CREATE TABLE IF NOT EXISTS `base_sys_error_catalog` (
     `deprecated` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否已废弃',
     `description` varchar(1000) DEFAULT NULL COMMENT '说明',
     `created_by` varchar(100) NOT NULL DEFAULT 'system',
-    `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_by` varchar(100) NOT NULL DEFAULT 'system',
-    `updated_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_error_catalog_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='全局错误码目录';
