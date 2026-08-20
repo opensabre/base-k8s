@@ -3,6 +3,8 @@ services:
     image: ${BASE_AUTHORIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-authorization:latest}
     container_name: base-authorization
     restart: always
+    mem_limit: ${BASE_AUTHORIZATION_MEMORY_LIMIT:-768m}
+    mem_reservation: ${BASE_AUTHORIZATION_MEMORY_RESERVATION:-256m}
     ports:
       - "8000:8000"
     environment:
