@@ -3,6 +3,8 @@ services:
     image: ${BASE_ORGANIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-organization:latest}
     container_name: base-organization
     restart: always
+    mem_limit: ${BASE_ORGANIZATION_MEMORY_LIMIT:-768m}
+    mem_reservation: ${BASE_ORGANIZATION_MEMORY_RESERVATION:-256m}
     ports:
       - "8010:8010"
     environment:

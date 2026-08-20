@@ -3,6 +3,8 @@ services:
     image: ${BASE_SYSADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-sysadmin:latest}
     container_name: base-sysadmin
     restart: always
+    mem_limit: ${BASE_SYSADMIN_MEMORY_LIMIT:-1g}
+    mem_reservation: ${BASE_SYSADMIN_MEMORY_RESERVATION:-384m}
     ports:
       - "8020:8020"
     environment:
