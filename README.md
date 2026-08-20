@@ -98,10 +98,11 @@ REGISTER_HOST=中间件服务器内网IP
 REDIS_HOST=中间件服务器内网IP
 DATASOURCE_HOST=中间件服务器内网IP
 RABBIT_MQ_HOST=中间件服务器内网IP
+# 仅启用 Sentinel profile 时需要
 SENTINEL_DASHBOARD_HOST=中间件服务器内网IP
 ```
 
-然后在应用服务器启动：
+默认不启动 Sentinel 控制台；如需临时启用，使用 `--profile sentinel`。然后在应用服务器启动：
 
 ```bash
 docker compose -f docker-compose-apps.yml up -d
@@ -122,7 +123,7 @@ docker compose -f docker-compose-apps.yml up -d
 | redis | 6379 | 6379 | 缓存 |
 | rnacos | 8848, 9848, 10848 | 同左 | 注册/配置中心，10848 为控制台 |
 | rabbitmq | 5672, 15672 | 同左 | MQ 与管理端 |
-| sentinel-dashboard | 8858 | 8858 | Sentinel 控制台 |
+| sentinel-dashboard | 8858 | 8858 | Sentinel 控制台（默认关闭，profile: sentinel） |
 
 如果只想从网关访问后端服务，可以按安全策略移除 `8000/8010/8020/3306/6379` 等端口映射。
 
