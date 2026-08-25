@@ -1,4 +1,6 @@
 x-app-env: &app-env
+  JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:-JASYPT@123456}
+  INTERNAL_TOKEN_KEY_WRITE_ENABLED: ${INTERNAL_TOKEN_KEY_WRITE_ENABLED:-false}
   REGISTER_HOST: ${REGISTER_HOST:-rnacos}
   REGISTER_PORT: ${REGISTER_PORT:-8848}
   REDIS_HOST: ${REDIS_HOST:-redis}
@@ -33,7 +35,7 @@ x-app-volumes: &app-volumes
 x-app-depends-on: &app-depends-on
   mysql:
     condition: service_healthy
-  redis:
+  redis: 
     condition: service_healthy
   rnacos:
     condition: service_started
@@ -86,7 +88,9 @@ services:
       timeout: 5s
       retries: 30
     networks:
-      - opensabre
+      opensabre:
+        aliases:
+          - redis
 
   rnacos:
     image: ${RNACOS_IMAGE:-qingpan/rnacos:stable}
@@ -142,12 +146,14 @@ services:
     environment:
       <<: *app-env
       SERVER_PORT: 8000
+      AUTH_ISSUER_URI: ${AUTH_ISSUER_URI:-http://base-authorization:8000}
     ports:
       - "8000:8000"
     volumes:
       - ./config/bootstrap.yml:/app/bootstrap.yml:ro
       - ./config/application.yml:/app/config/application.yml:ro
       - ./logs/base-authorization:/app/logs
+      - ./nacos/base-authorization:/app/nacos
     depends_on: *app-depends-on
     networks:
       opensabre:
@@ -169,6 +175,7 @@ services:
       - ./config/bootstrap.yml:/app/bootstrap.yml:ro
       - ./config/application.yml:/app/config/application.yml:ro
       - ./logs/base-organization:/app/logs
+      - ./nacos/base-organization/nacos:/app/nacos
     depends_on: *app-depends-on
     networks:
       - opensabre
@@ -182,14 +189,17 @@ services:
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?JASYPT_ENCRYPTOR_PASSWORD is required}
       INTERNAL_TOKEN_KEY_WRITE_ENABLED: ${INTERNAL_TOKEN_KEY_WRITE_ENABLED:-false}
       # CI 镜像以非 root 用户运行，将 Nacos Client 日志写入已挂载的应用日志目录。
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs}
       SERVER_PORT: 8020
+      AUTH_ISSUER_URI: ${AUTH_ISSUER_URI:-http://base-authorization:8000}
+      AUTH_JWK_SET_URI: ${AUTH_JWK_SET_URI:-http://base-authorization:8000/oauth2/jwks}
     ports:
       - "8020:8020"
     volumes:
       - ./config/bootstrap.yml:/app/bootstrap.yml:ro
       - ./config/application.yml:/app/config/application.yml:ro
       - ./logs/base-sysadmin:/app/logs
+      - ./nacos/base-sysadmin:/app/nacos
     depends_on: *app-depends-on
     networks:
       - opensabre
@@ -211,6 +221,7 @@ services:
       - ./config/base-gateway-application.yml:/app/config/application.yml:ro
       - ./config/base-gateway.yml:/app/resources/base-gateway.yml:ro
       - ./logs/base-gateway:/app/logs
+      - ./nacos/base-gateway:/app/nacos
     depends_on:
       <<: *app-depends-on
       base-authorization:

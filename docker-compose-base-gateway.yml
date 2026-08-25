@@ -36,6 +36,7 @@ services:
       - ./config/bootstrap.yml:/app/bootstrap.yml:ro
       - ./config/base-gateway.yml:/app/resources/base-gateway.yml:ro
       - ./logs/base-gateway:/app/logs
+      - ./nacos/base-gateway:/app/nacos
     networks:
       opensabre:
         aliases:
