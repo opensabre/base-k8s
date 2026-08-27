@@ -280,14 +280,14 @@ VALUES (101, -1, '总公司', '总公司', now(3), now(3), 'system', 'system'),
        (107, 101, '北京分公司', '北京分公司', now(3), now(3), 'system', 'system');
 -- 菜单
 INSERT INTO base_org_menu (id, parent_id, type, href, icon, name, description, order_num, created_time, updated_time, created_by, updated_by)
-VALUES (101, -1, 'MENU', '/admin', 'setting', '基础管理', '用户，角色，菜单，组织等基础数据管理', 0, now(3), now(3), 'system', 'system'),
+VALUES (101, -1, 'MENU', '/admin', 'setting', '系统管理', '用户，角色，菜单，部门等基础数据管理', 0, now(3), now(3), 'system', 'system'),
        (102, 101, 'MENU', '/admin/users', 'user', '用户管理', '用户新增，修改，查看，删除', 10, now(3), now(3), 'system', 'system'),
        (103, 101, 'MENU', '/admin/menus', 'menu', '菜单管理', '菜单新增，修改，删除', 20, now(3), now(3), 'system', 'system'),
        (104, 101, 'MENU', '/admin/roles', 'role', '角色管理', '角色新增，修改，删除和菜单授权', 30, now(3), now(3), 'system', 'system'),
-       (105, 101, 'MENU', '/admin/groups', 'tree', '组织管理', '组织新增，修改，查看，删除', 40, now(3), now(3), 'system', 'system'),
+       (105, 101, 'MENU', '/admin/groups', 'tree', '部门管理', '部门新增，修改，查看，删除', 40, now(3), now(3), 'system', 'system'),
        (106, 101, 'MENU', '/admin/resources', 'api', '资源管理', '功能资源新增，修改，查看，删除', 50, now(3), now(3), 'system', 'system'),
        (107, 101, 'MENU', '/admin/positions', 'project', '岗位管理', '岗位新增，修改，查看，删除', 60, now(3), now(3), 'system', 'system'),
-       (108, -1, 'MENU', '/auth', 'client', '认证鉴权', '认证鉴权服务管理', 70, now(3), now(3), 'system', 'system'),
+       (108, -1, 'MENU', '/auth', 'client', '安全认证', '安全认证服务管理', 70, now(3), now(3), 'system', 'system'),
        (109, -1, 'MENU', '/sysadmin', 'document', '系统管理', '审计与系统运维管理', 80, now(3), now(3), 'system', 'system'),
        (110, 108, 'MENU', '/auth/client', 'client', '客户端管理', 'OAuth2客户端新增，修改，删除', 10, now(3), now(3), 'system', 'system'),
        (111, 109, 'MENU', '/sysadmin/audit-log', 'document', '审计日志', '审计日志查询，清理', 10, now(3), now(3), 'system', 'system'),
@@ -299,7 +299,7 @@ VALUES (101, -1, 'MENU', '/admin', 'setting', '基础管理', '用户，角色�
        (120, 109, 'MENU', '/gateway/api-routes', 'api', '路由管理', '{"routeName":"GatewayApiRoutes","component":"system/gateway/api-routes/index","visible":1}', 60, now(3), now(3), 'system', 'system'),
        (159, 120, 'BUTTON', '', '', '发布 OAuth2 认证方式', '{"perm":"gateway:oauth2-client:update"}', 4, now(3), now(3), 'system', 'system'),
        (116, 109, 'MENU', '/sysadmin/online-user', 'user', '在线用户', '{"routeName":"OnlineUser","component":"security/online-user/index","visible":1}', 60, now(3), now(3), 'system', 'system'),
-       (220, 109, 'MENU', '/sysadmin/internal-token-keys', 'lock', '内部 Token 密钥', '{"routeName":"InternalTokenKeys","component":"sysadmin/internal-token-keys/index","visible":1}', 75, now(3), now(3), 'system', 'system'),
+       (220, 109, 'MENU', '/sysadmin/internal-token-keys', 'lock', '内部认证', '{"routeName":"InternalTokenKeys","component":"sysadmin/internal-token-keys/index","visible":1}', 75, now(3), now(3), 'system', 'system'),
        (221, 220, 'BUTTON', '', '', '轮换内部 Token 密钥', '{"perm":"sysadmin:internal-token-key:rotate"}', 1, now(3), now(3), 'system', 'system'),
        (222, 220, 'BUTTON', '', '', '退役 previous 密钥', '{"perm":"sysadmin:internal-token-key:retire"}', 2, now(3), now(3), 'system', 'system');
 
