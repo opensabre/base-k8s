@@ -1,0 +1,55 @@
+services:
+  iqc-platform-admin:
+    image: ${IQC_PLATFORM_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/iqc-platform-admin:latest}
+    container_name: iqc-platform-admin
+    restart: unless-stopped
+    ports:
+      - "3010:80"
+    networks:
+      - opensabre
+
+  iqc-platform:
+    image: ${IQC_PLATFORM_IMAGE:-ccr.ccs.tencentyun.com/opensabre/iqc-platform:latest}
+    container_name: iqc-platform
+    restart: unless-stopped
+    mem_limit: ${IQC_PLATFORM_MEMORY_LIMIT:-1g}
+    mem_reservation: ${IQC_PLATFORM_MEMORY_RESERVATION:-384m}
+    ports:
+      - "8040:8040"
+    environment:
+      SERVER_PORT: 8040
+      AUTH_ISSUER_URI: ${AUTH_ISSUER_URI:-http://base-authorization:8000}
+      REGISTER_HOST: ${REGISTER_HOST:-rnacos}
+      REGISTER_PORT: ${REGISTER_PORT:-8848}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      DATASOURCE_DBTYPE: ${DATASOURCE_DBTYPE:-mysql}
+      DATASOURCE_HOST: ${DATASOURCE_HOST:-mysql}
+      DATASOURCE_PORT: ${DATASOURCE_PORT:-3306}
+      DATASOURCE_USERNAME: ${IQC_DATASOURCE_USERNAME:-iqc_platform}
+      DATASOURCE_PASSWORD: ${IQC_DATASOURCE_PASSWORD:?IQC_DATASOURCE_PASSWORD is required}
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?JASYPT_ENCRYPTOR_PASSWORD is required}
+      SYSADMIN_SERVICE_ID: ${SYSADMIN_SERVICE_ID:-base-sysadmin}
+      ORGANIZATION_SERVICE_ID: ${ORGANIZATION_SERVICE_ID:-base-organization}
+      GOVERNANCE_USAGE_TRANSPORT: ${GOVERNANCE_USAGE_TRANSPORT:-EDA}
+      GOVERNANCE_REGISTRATION_TOKEN: ${GOVERNANCE_REGISTRATION_TOKEN:-${ERROR_CATALOG_REGISTRATION_TOKEN:-}}
+      ERROR_CATALOG_REGISTRATION_TOKEN: ${ERROR_CATALOG_REGISTRATION_TOKEN:-${GOVERNANCE_REGISTRATION_TOKEN:-}}
+      DICTIONARY_REGISTRATION_TOKEN: ${DICTIONARY_REGISTRATION_TOKEN:-${GOVERNANCE_REGISTRATION_TOKEN:-}}
+      RESOURCE_REGISTRATION_TOKEN: ${RESOURCE_REGISTRATION_TOKEN:-${GOVERNANCE_REGISTRATION_TOKEN:-}}
+      DICTIONARY_REGISTRATION_ENABLED: ${DICTIONARY_REGISTRATION_ENABLED:-true}
+      IQC_LLM_ENABLED: ${IQC_LLM_ENABLED:-false}
+      IQC_LLM_PROVIDER: ${IQC_LLM_PROVIDER:-spring-ai}
+      IQC_LLM_ENDPOINT: ${IQC_LLM_ENDPOINT:-}
+      IQC_LLM_API_KEY: ${IQC_LLM_API_KEY:-}
+      IQC_LLM_MODEL: ${IQC_LLM_MODEL:-}
+      NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -DJM.SNAPSHOT.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs/csp}
+    volumes:
+      - ./logs/iqc-platform:/app/logs
+    networks:
+      - opensabre
+
+networks:
+  opensabre:
+    name: opensabre
+    external: true

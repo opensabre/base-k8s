@@ -3,6 +3,8 @@ services:
     image: ${BASE_GATEWAY_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-gateway-admin:latest}
     container_name: base-gateway-admin
     restart: unless-stopped
+    mem_limit: ${BASE_GATEWAY_ADMIN_MEMORY_LIMIT:-768m}
+    mem_reservation: ${BASE_GATEWAY_ADMIN_MEMORY_RESERVATION:-256m}
     ports:
       - "8030:8030"
     environment:
