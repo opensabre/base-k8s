@@ -114,7 +114,7 @@ opensabre:
   gateway:
     # 网关白名单，无需要签权path
     permit:
-      paths: /v3/**,/webjars/**,/assets/**,/doc.html,/favicon.ico,/oauth2/**,/api/sysadmin/captcha/send/image,/api/auth/logout
+      paths: /v3/**,/webjars/**,/assets/**,/doc.html,/favicon.ico,/oauth2/**,/api/sysadmin/captcha/send/image
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD}
