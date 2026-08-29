@@ -32,6 +32,9 @@ services:
       GATEWAY_LOCAL_OAUTH_CLIENT_ID: ${GATEWAY_LOCAL_OAUTH_CLIENT_ID:-base-gateway-local}
       GATEWAY_LOCAL_OAUTH_CLIENT_SECRET: ${GATEWAY_LOCAL_OAUTH_CLIENT_SECRET:-base-gateway-local}
       GATEWAY_LOCAL_REDIRECT_URI: ${GATEWAY_LOCAL_REDIRECT_URI:-http://localhost:3000/login/oauth2/code/base-gateway-local}
+      IQC_GATEWAY_LOCAL_OAUTH_CLIENT_ID: ${IQC_GATEWAY_LOCAL_OAUTH_CLIENT_ID:-iqc-platform-local}
+      IQC_GATEWAY_LOCAL_OAUTH_CLIENT_SECRET: ${IQC_GATEWAY_LOCAL_OAUTH_CLIENT_SECRET:-base-gateway-local}
+      IQC_GATEWAY_LOCAL_REDIRECT_URI: ${IQC_GATEWAY_LOCAL_REDIRECT_URI:-http://localhost:3010/login/oauth2/code/iqc-platform-local}
       NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
       HOME: ${CONTAINER_HOME:-/app}
     volumes:
