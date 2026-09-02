@@ -235,7 +235,7 @@ services:
           - gateway
 
   opensabre-admin:
-    image: ${OPENSABRE_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/opensabre-admin:master}
+    image: ${OPENSABRE_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/opensabre-admin:latest}
     container_name: opensabre-admin
     restart: unless-stopped
     ports:
