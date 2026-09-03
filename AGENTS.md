@@ -28,7 +28,11 @@ If you add new stacks, follow the `docker-compose-base-<name>.yml` naming patter
 
 ## Testing Guidelines
 
-No automated tests are present in this repository. If you introduce tests or validation scripts, document them here and add a one-line run command (for example, `make test` or `docker compose config`).
+Database migration validation is automated:
+
+- `scripts/validate-flyway-migrations.sh ..` checks ownership, naming, and target-containment rules.
+- `scripts/validate-database-release-targets.sh .. releases/1.1.3-database-targets.env` checks the release mapping.
+- `scripts/test-flyway-fresh-install.sh ..` uses a disposable MySQL container and isolated per-service accounts.
 
 ## Commit & Pull Request Guidelines
 
