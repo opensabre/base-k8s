@@ -8,6 +8,16 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-opensabre}
       MYSQL_USER: ${DATASOURCE_USERNAME:-opensabre}
       MYSQL_PASSWORD: ${DATASOURCE_PASSWORD:-opensabre_change_me}
+      AUTH_MIGRATION_USERNAME: ${AUTH_MIGRATION_USERNAME:-opensabre_auth_migration}
+      AUTH_MIGRATION_PASSWORD: ${AUTH_MIGRATION_PASSWORD:?AUTH_MIGRATION_PASSWORD is required}
+      ORGANIZATION_MIGRATION_USERNAME: ${ORGANIZATION_MIGRATION_USERNAME:-opensabre_org_migration}
+      ORGANIZATION_MIGRATION_PASSWORD: ${ORGANIZATION_MIGRATION_PASSWORD:?ORGANIZATION_MIGRATION_PASSWORD is required}
+      SYSADMIN_MIGRATION_USERNAME: ${SYSADMIN_MIGRATION_USERNAME:-opensabre_sys_migration}
+      SYSADMIN_MIGRATION_PASSWORD: ${SYSADMIN_MIGRATION_PASSWORD:?SYSADMIN_MIGRATION_PASSWORD is required}
+      GATEWAY_ADMIN_MIGRATION_USERNAME: ${GATEWAY_ADMIN_MIGRATION_USERNAME:-opensabre_gateway_migration}
+      GATEWAY_ADMIN_MIGRATION_PASSWORD: ${GATEWAY_ADMIN_MIGRATION_PASSWORD:?GATEWAY_ADMIN_MIGRATION_PASSWORD is required}
+      IQC_MIGRATION_USERNAME: ${IQC_MIGRATION_USERNAME:-iqc_migration}
+      IQC_MIGRATION_PASSWORD: ${IQC_MIGRATION_PASSWORD:?IQC_MIGRATION_PASSWORD is required}
       TZ: Asia/Shanghai
     command:
       - --character-set-server=utf8mb4
@@ -18,9 +28,6 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./initdb/10-opensabre-init.sh:/docker-entrypoint-initdb.d/10-opensabre-init.sh:ro
-      - ./initdb/sql/base-authorization:/opt/opensabre/sql/base-authorization:ro
-      - ./initdb/sql/base-organization:/opt/opensabre/sql/base-organization:ro
-      - ./initdb/sql/base-sysadmin:/opt/opensabre/sql/base-sysadmin:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
       interval: 10s

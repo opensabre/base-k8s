@@ -1,0 +1,61 @@
+x-migration: &migration
+  restart: "no"
+  entrypoint: ["java", "-cp", "/app/resources:/app/classes:/app/libs/*", "io.github.opensabre.migration.FlywayMigrationRunner"]
+  networks:
+    - opensabre
+
+services:
+  base-authorization-migration:
+    <<: *migration
+    image: ${BASE_AUTHORIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-authorization:latest}
+    environment:
+      FLYWAY_DATABASE: os_base_auth
+      FLYWAY_TARGET: ${BASE_AUTHORIZATION_DATABASE_TARGET:?BASE_AUTHORIZATION_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/os_base_auth?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${AUTH_MIGRATION_USERNAME:-opensabre_auth_migration}
+      FLYWAY_PASSWORD: ${AUTH_MIGRATION_PASSWORD:?AUTH_MIGRATION_PASSWORD is required}
+
+  base-organization-migration:
+    <<: *migration
+    image: ${BASE_ORGANIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-organization:latest}
+    environment:
+      FLYWAY_DATABASE: os_base_organization
+      FLYWAY_TARGET: ${BASE_ORGANIZATION_DATABASE_TARGET:?BASE_ORGANIZATION_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/os_base_organization?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${ORGANIZATION_MIGRATION_USERNAME:-opensabre_org_migration}
+      FLYWAY_PASSWORD: ${ORGANIZATION_MIGRATION_PASSWORD:?ORGANIZATION_MIGRATION_PASSWORD is required}
+
+  base-sysadmin-migration:
+    <<: *migration
+    image: ${BASE_SYSADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-sysadmin:latest}
+    environment:
+      FLYWAY_DATABASE: os_base_sysadmin
+      FLYWAY_TARGET: ${BASE_SYSADMIN_DATABASE_TARGET:?BASE_SYSADMIN_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/os_base_sysadmin?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${SYSADMIN_MIGRATION_USERNAME:-opensabre_sys_migration}
+      FLYWAY_PASSWORD: ${SYSADMIN_MIGRATION_PASSWORD:?SYSADMIN_MIGRATION_PASSWORD is required}
+
+  base-gateway-admin-migration:
+    <<: *migration
+    image: ${BASE_GATEWAY_ADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-gateway-admin:latest}
+    environment:
+      FLYWAY_DATABASE: os_base_gateway_admin
+      FLYWAY_TARGET: ${BASE_GATEWAY_ADMIN_DATABASE_TARGET:?BASE_GATEWAY_ADMIN_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/os_base_gateway_admin?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${GATEWAY_ADMIN_MIGRATION_USERNAME:-opensabre_gateway_migration}
+      FLYWAY_PASSWORD: ${GATEWAY_ADMIN_MIGRATION_PASSWORD:?GATEWAY_ADMIN_MIGRATION_PASSWORD is required}
+
+  iqc-platform-migration:
+    <<: *migration
+    image: ${IQC_PLATFORM_IMAGE:-ccr.ccs.tencentyun.com/opensabre/iqc-platform:latest}
+    environment:
+      FLYWAY_DATABASE: iqc_platform
+      FLYWAY_TARGET: ${IQC_PLATFORM_DATABASE_TARGET:?IQC_PLATFORM_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/iqc_platform?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${IQC_MIGRATION_USERNAME:-iqc_migration}
+      FLYWAY_PASSWORD: ${IQC_MIGRATION_PASSWORD:?IQC_MIGRATION_PASSWORD is required}
+
+networks:
+  opensabre:
+    name: opensabre
+    external: true

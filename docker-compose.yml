@@ -23,9 +23,6 @@ x-app-env: &app-env
   GATEWAY_REDIRECT_URI: ${GATEWAY_REDIRECT_URI:-http://localhost:8443/login/oauth2/code/base-gateway-client}
   GATEWAY_OAUTH_CLIENT_ID: ${GATEWAY_OAUTH_CLIENT_ID:-test_client1}
   GATEWAY_OAUTH_CLIENT_SECRET: ${GATEWAY_OAUTH_CLIENT_SECRET:-test_client1}
-  GOVERNANCE_REGISTRATION_TOKEN: ${GOVERNANCE_REGISTRATION_TOKEN:-${ERROR_CATALOG_REGISTRATION_TOKEN:-}}
-  ERROR_CATALOG_REGISTRATION_TOKEN: ${ERROR_CATALOG_REGISTRATION_TOKEN:-${GOVERNANCE_REGISTRATION_TOKEN:-}}
-  RESOURCE_REGISTRATION_TOKEN: ${RESOURCE_REGISTRATION_TOKEN:-${GOVERNANCE_REGISTRATION_TOKEN:-}}
   NACOS_DISCOVERY_IP: ${NACOS_DISCOVERY_IP:-}
   HOME: ${CONTAINER_HOME:-/app}
 
@@ -53,6 +50,16 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-opensabre}
       MYSQL_USER: ${DATASOURCE_USERNAME:-opensabre}
       MYSQL_PASSWORD: ${DATASOURCE_PASSWORD:-opensabre_change_me}
+      AUTH_MIGRATION_USERNAME: ${AUTH_MIGRATION_USERNAME:-opensabre_auth_migration}
+      AUTH_MIGRATION_PASSWORD: ${AUTH_MIGRATION_PASSWORD:?AUTH_MIGRATION_PASSWORD is required}
+      ORGANIZATION_MIGRATION_USERNAME: ${ORGANIZATION_MIGRATION_USERNAME:-opensabre_org_migration}
+      ORGANIZATION_MIGRATION_PASSWORD: ${ORGANIZATION_MIGRATION_PASSWORD:?ORGANIZATION_MIGRATION_PASSWORD is required}
+      SYSADMIN_MIGRATION_USERNAME: ${SYSADMIN_MIGRATION_USERNAME:-opensabre_sys_migration}
+      SYSADMIN_MIGRATION_PASSWORD: ${SYSADMIN_MIGRATION_PASSWORD:?SYSADMIN_MIGRATION_PASSWORD is required}
+      GATEWAY_ADMIN_MIGRATION_USERNAME: ${GATEWAY_ADMIN_MIGRATION_USERNAME:-opensabre_gateway_migration}
+      GATEWAY_ADMIN_MIGRATION_PASSWORD: ${GATEWAY_ADMIN_MIGRATION_PASSWORD:?GATEWAY_ADMIN_MIGRATION_PASSWORD is required}
+      IQC_MIGRATION_USERNAME: ${IQC_MIGRATION_USERNAME:-iqc_migration}
+      IQC_MIGRATION_PASSWORD: ${IQC_MIGRATION_PASSWORD:?IQC_MIGRATION_PASSWORD is required}
       TZ: Asia/Shanghai
     command:
       - --character-set-server=utf8mb4
@@ -63,9 +70,6 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./initdb/10-opensabre-init.sh:/docker-entrypoint-initdb.d/10-opensabre-init.sh:ro
-      - ./initdb/sql/base-authorization:/opt/opensabre/sql/base-authorization:ro
-      - ./initdb/sql/base-organization:/opt/opensabre/sql/base-organization:ro
-      - ./initdb/sql/base-sysadmin:/opt/opensabre/sql/base-sysadmin:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
       interval: 10s
@@ -141,6 +145,54 @@ services:
     networks:
       - opensabre
 
+  base-authorization-migration:
+    image: ${BASE_AUTHORIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-authorization:latest}
+    restart: "no"
+    entrypoint: ["java", "-cp", "/app/resources:/app/classes:/app/libs/*", "io.github.opensabre.migration.FlywayMigrationRunner"]
+    environment:
+      FLYWAY_DATABASE: os_base_auth
+      FLYWAY_TARGET: ${BASE_AUTHORIZATION_DATABASE_TARGET:?BASE_AUTHORIZATION_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/os_base_auth?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${AUTH_MIGRATION_USERNAME:-opensabre_auth_migration}
+      FLYWAY_PASSWORD: ${AUTH_MIGRATION_PASSWORD:?AUTH_MIGRATION_PASSWORD is required}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - opensabre
+
+  base-organization-migration:
+    image: ${BASE_ORGANIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-organization:latest}
+    restart: "no"
+    entrypoint: ["java", "-cp", "/app/resources:/app/classes:/app/libs/*", "io.github.opensabre.migration.FlywayMigrationRunner"]
+    environment:
+      FLYWAY_DATABASE: os_base_organization
+      FLYWAY_TARGET: ${BASE_ORGANIZATION_DATABASE_TARGET:?BASE_ORGANIZATION_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/os_base_organization?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${ORGANIZATION_MIGRATION_USERNAME:-opensabre_org_migration}
+      FLYWAY_PASSWORD: ${ORGANIZATION_MIGRATION_PASSWORD:?ORGANIZATION_MIGRATION_PASSWORD is required}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - opensabre
+
+  base-sysadmin-migration:
+    image: ${BASE_SYSADMIN_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-sysadmin:latest}
+    restart: "no"
+    entrypoint: ["java", "-cp", "/app/resources:/app/classes:/app/libs/*", "io.github.opensabre.migration.FlywayMigrationRunner"]
+    environment:
+      FLYWAY_DATABASE: os_base_sysadmin
+      FLYWAY_TARGET: ${BASE_SYSADMIN_DATABASE_TARGET:?BASE_SYSADMIN_DATABASE_TARGET is required}
+      FLYWAY_URL: "jdbc:mysql://${DATASOURCE_HOST:-mysql}:${DATASOURCE_PORT:-3306}/os_base_sysadmin?characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true"
+      FLYWAY_USER: ${SYSADMIN_MIGRATION_USERNAME:-opensabre_sys_migration}
+      FLYWAY_PASSWORD: ${SYSADMIN_MIGRATION_PASSWORD:?SYSADMIN_MIGRATION_PASSWORD is required}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - opensabre
+
   base-authorization:
     image: ${BASE_AUTHORIZATION_IMAGE:-ccr.ccs.tencentyun.com/opensabre/base-authorization:latest}
     container_name: base-authorization
@@ -158,7 +210,10 @@ services:
       - ./config/application.yml:/app/config/application.yml:ro
       - ./logs/base-authorization:/app/logs
       - ./nacos/base-authorization:/app/nacos
-    depends_on: *app-depends-on
+    depends_on:
+      <<: *app-depends-on
+      base-authorization-migration:
+        condition: service_completed_successfully
     networks:
       opensabre:
         aliases:
@@ -182,7 +237,10 @@ services:
       - ./config/application.yml:/app/config/application.yml:ro
       - ./logs/base-organization:/app/logs
       - ./nacos/base-organization/nacos:/app/nacos
-    depends_on: *app-depends-on
+    depends_on:
+      <<: *app-depends-on
+      base-organization-migration:
+        condition: service_completed_successfully
     networks:
       - opensabre
 
@@ -208,7 +266,10 @@ services:
       - ./config/application.yml:/app/config/application.yml:ro
       - ./logs/base-sysadmin:/app/logs
       - ./nacos/base-sysadmin:/app/nacos
-    depends_on: *app-depends-on
+    depends_on:
+      <<: *app-depends-on
+      base-sysadmin-migration:
+        condition: service_completed_successfully
     networks:
       - opensabre
 
