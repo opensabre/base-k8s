@@ -1,7 +1,7 @@
 # Database migrations
 
-OpenSabre currently supports MySQL. Every database-owning service keeps its immutable Flyway
-history under `src/main/resources/db/migration/mysql`; `base-k8s` provisions databases and
+OpenSabre currently supports MySQL. Every database-owning service keeps its Flyway migrations under
+`src/main/resources/db/migration/<vendor>`; `base-k8s` provisions databases and
 orchestrates migrations but does not own or copy application DDL/DML.
 
 ## Release contract
@@ -35,9 +35,19 @@ only after all Jobs report `Complete`.
 
 ## Authoring rules
 
-- Add a new versioned SQL file; never edit a migration that has reached a shared environment.
+- Keep cumulative `B` migrations in `baseline/`, immutable released migrations in `history/`, new
+  schema migrations in `ddl/`, and new data migrations in `dml/`.
+- The current product schema and controlled seed data are frozen as the product baseline. A released
+  baseline is immutable and must not be regenerated when later changes are added.
+- Baseline files are generated state snapshots and may contain both schema and controlled initial
+  data. `scripts/generate-flyway-baselines.sh` reproduces the initial baseline from immutable history;
+  it is not part of the normal incremental authoring workflow.
+- Add new versioned SQL under `ddl/` or `dml/`; never edit or rename a migration that has reached a
+  shared environment.
 - Use a unique, monotonically increasing version and a lowercase description, for example
-  `V20260902_01__add_example_index.sql`.
+  `ddl/V20260902_01__ddl_add_example_index.sql` or
+  `dml/V20260902_02__dml_seed_example.sql`. Directory order does not control execution; versions do.
+- Do not mix data-changing statements into `ddl/`, or schema-changing statements into `dml/`.
 - Make forward migrations compatible with the currently deployed application. Use expand-contract
   for destructive changes.
 - Keep database/user provisioning in `base-k8s/initdb`; keep tables, indexes, constraints and
@@ -57,8 +67,8 @@ test run:
 2. Create a temporary account that has privileges only on that database. Do not use `root` or the
    shared application account.
 3. Set both the JDBC URL database and `FLYWAY_DATABASE` to that exact name.
-4. Run `migrate` twice: the first run must apply the complete history and the second must execute
-   zero migrations.
+4. Run `migrate` twice: the first run must apply the latest `B` state baseline plus every newer
+   versioned migration, and the second must execute zero migrations.
 5. Run schema and seed-data assertions, then remove the temporary account and database through the
    approved cleanup procedure.
 

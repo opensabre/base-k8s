@@ -8,6 +8,9 @@ jobs:
   mysql-fresh-install:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # Remove after all service repositories adopt baseline/history/ddl/dml.
+      ALLOW_LEGACY_FLYWAY_LAYOUT: 'true'
     steps:
       - uses: actions/checkout@v4
         with:

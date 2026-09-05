@@ -20,6 +20,28 @@ seed_assertions=(
   'SELECT 1'
 )
 
+requested_service="${2:-}"
+if [[ -n "${requested_service}" ]]; then
+  case "${requested_service}" in
+    base-authorization)
+      services=(base-authorization); databases=(os_base_auth); expected_table_counts=(4)
+      seed_assertions=('SELECT COUNT(*) FROM oauth2_registered_client') ;;
+    base-organization)
+      services=(base-organization); databases=(os_base_organization); expected_table_counts=(14)
+      seed_assertions=('SELECT COUNT(*) FROM base_org_user') ;;
+    base-sysadmin)
+      services=(base-sysadmin); databases=(os_base_sysadmin); expected_table_counts=(14)
+      seed_assertions=('SELECT COUNT(*) FROM base_sys_dict_type') ;;
+    base-gateway-admin)
+      services=(base-gateway-admin); databases=(os_base_gateway_admin); expected_table_counts=(11)
+      seed_assertions=('SELECT 1') ;;
+    iqc-platform)
+      services=(iqc-platform); databases=(iqc_platform); expected_table_counts=(20)
+      seed_assertions=('SELECT 1') ;;
+    *) echo "ERROR: unsupported service ${requested_service}" >&2; exit 2 ;;
+  esac
+fi
+
 cleanup() {
   status=$?
   if [[ ${status} -ne 0 ]]; then
@@ -31,7 +53,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-"${workspace_root}/base-k8s/scripts/validate-flyway-migrations.sh" "${workspace_root}"
+"${workspace_root}/base-k8s/scripts/validate-flyway-migrations.sh" "${workspace_root}" "${services[@]}"
 
 docker network create "${network}" >/dev/null
 docker run -d --name "${mysql_container}" --network "${network}" \
@@ -85,6 +107,8 @@ for index in "${!services[@]}"; do
   "${flyway[@]}" migrate
   first_count="$(docker exec "${mysql_container}" mysql -u"${user}" -p"${password}" -Nse \
     "SELECT COUNT(*) FROM \`${database}\`.flyway_schema_history")"
+  baseline_count="$(docker exec "${mysql_container}" mysql -u"${user}" -p"${password}" -Nse \
+    "SELECT COUNT(*) FROM \`${database}\`.flyway_schema_history WHERE script LIKE 'B%__baseline.sql' AND success=1")"
   "${flyway[@]}" validate
   "${flyway[@]}" migrate
   second_count="$(docker exec "${mysql_container}" mysql -u"${user}" -p"${password}" -Nse \
@@ -96,6 +120,10 @@ for index in "${!services[@]}"; do
 
   if [[ "${first_count}" -eq 0 || "${first_count}" -ne "${second_count}" ]]; then
     echo "ERROR ${service}: repeat migration changed history (${first_count} -> ${second_count})" >&2
+    exit 1
+  fi
+  if [[ -d "${migration_dir}/baseline" && "${baseline_count}" -ne 1 ]]; then
+    echo "ERROR ${service}: fresh database did not apply exactly one baseline migration" >&2
     exit 1
   fi
   if [[ "${table_count}" -ne "${expected_table_counts[$index]}" || "${seed_count}" -lt 1 ]]; then
