@@ -18,35 +18,6 @@ for service in "${services[@]}"; do
     continue
   fi
 
-  if [[ "${ALLOW_LEGACY_FLYWAY_LAYOUT:-false}" == true && ! -d "${migration_dir}/baseline" ]]; then
-    versions=""
-    baseline_count=0
-    while IFS= read -r file; do
-      name="$(basename "${file}")"
-      if [[ ! "${name}" =~ ^V[0-9]+([._][0-9]+)*__[a-z0-9_]+\.sql$ ]]; then
-        echo "ERROR ${service}: invalid legacy Flyway filename ${name}" >&2
-        failed=1
-        continue
-      fi
-      versions="${versions}${name%%__*}\n"
-      [[ "${name}" == *"__baseline.sql" ]] && baseline_count=$((baseline_count + 1))
-      if grep -Eni '^[[:space:]]*(USE([[:space:]]|\`)|CREATE[[:space:]]+DATABASE|DROP[[:space:]]+DATABASE)|\`(os_base_[^\`]+|iqc_platform)\`[[:space:]]*\.' "${file}" >/dev/null; then
-        echo "ERROR ${service}: ${name} may not switch, create, drop, or explicitly qualify an OpenSabre database" >&2
-        failed=1
-      fi
-    done < <(find "${migration_dir}" -maxdepth 1 -type f -name '*.sql' -print | sort)
-    duplicates="$(printf '%b' "${versions}" | sort | uniq -d)"
-    if [[ -n "${duplicates}" ]]; then
-      echo "ERROR ${service}: duplicate legacy Flyway versions: ${duplicates}" >&2
-      failed=1
-    fi
-    if [[ ${baseline_count} -ne 1 ]]; then
-      echo "ERROR ${service}: expected exactly one legacy baseline migration, found ${baseline_count}" >&2
-      failed=1
-    fi
-    continue
-  fi
-
   for directory in baseline history ddl dml; do
     if [[ ! -d "${migration_dir}/${directory}" ]]; then
       echo "ERROR ${service}: missing ${directory}/ migration directory" >&2
