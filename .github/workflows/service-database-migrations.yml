@@ -1,0 +1,43 @@
+name: service-database-migrations
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        description: Repository containing the service migration resources
+        required: true
+        type: string
+      ref:
+        description: Commit SHA to validate
+        required: true
+        type: string
+      service:
+        description: OpenSabre service directory and validation profile
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  mysql-fresh-install:
+    name: Flyway MySQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout migration tooling
+        uses: actions/checkout@v4
+        with:
+          repository: opensabre/base-k8s
+          path: base-k8s
+      - name: Checkout service
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.ref }}
+          path: ${{ inputs.service }}
+          fetch-depth: 0
+      - name: Validate migration layout
+        run: base-k8s/scripts/validate-flyway-migrations.sh "$GITHUB_WORKSPACE" "${{ inputs.service }}"
+      - name: Migrate an isolated MySQL database twice
+        run: base-k8s/scripts/test-flyway-fresh-install.sh "$GITHUB_WORKSPACE" "${{ inputs.service }}"
