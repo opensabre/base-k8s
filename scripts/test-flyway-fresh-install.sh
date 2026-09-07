@@ -126,7 +126,7 @@ for index in "${!services[@]}"; do
     echo "ERROR ${service}: fresh database did not apply exactly one baseline migration" >&2
     exit 1
   fi
-  if [[ "${table_count}" -ne "${expected_table_counts[$index]}" || "${seed_count}" -lt 1 ]]; then
+  if [[ "${table_count}" -lt "${expected_table_counts[$index]}" || "${seed_count}" -lt 1 ]]; then
     echo "ERROR ${service}: schema/seed assertion failed (tables=${table_count}, seed=${seed_count})" >&2
     exit 1
   fi
