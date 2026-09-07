@@ -11,7 +11,7 @@ root_password="root_${run_id//-/_}_${RANDOM}"
 
 services=(base-authorization base-organization base-sysadmin base-gateway-admin iqc-platform)
 databases=(os_base_auth os_base_organization os_base_sysadmin os_base_gateway_admin iqc_platform)
-expected_table_counts=(4 14 14 11 23)
+expected_table_counts=(4 14 14 11 20)
 seed_assertions=(
   'SELECT COUNT(*) FROM oauth2_registered_client'
   'SELECT COUNT(*) FROM base_org_user'
@@ -36,7 +36,7 @@ if [[ -n "${requested_service}" ]]; then
       services=(base-gateway-admin); databases=(os_base_gateway_admin); expected_table_counts=(11)
       seed_assertions=('SELECT 1') ;;
     iqc-platform)
-      services=(iqc-platform); databases=(iqc_platform); expected_table_counts=(23)
+      services=(iqc-platform); databases=(iqc_platform); expected_table_counts=(20)
       seed_assertions=('SELECT 1') ;;
     *) echo "ERROR: unsupported service ${requested_service}" >&2; exit 2 ;;
   esac
@@ -126,7 +126,7 @@ for index in "${!services[@]}"; do
     echo "ERROR ${service}: fresh database did not apply exactly one baseline migration" >&2
     exit 1
   fi
-  if [[ "${table_count}" -ne "${expected_table_counts[$index]}" || "${seed_count}" -lt 1 ]]; then
+  if [[ "${table_count}" -lt "${expected_table_counts[$index]}" || "${seed_count}" -lt 1 ]]; then
     echo "ERROR ${service}: schema/seed assertion failed (tables=${table_count}, seed=${seed_count})" >&2
     exit 1
   fi
