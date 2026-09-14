@@ -75,30 +75,6 @@ spring:
               - read
               - openid
               - profile
-          iqc-platform-local:
-            provider: custom-issuer
-            client-name: IQC 本地前端
-            client-id: ${IQC_GATEWAY_LOCAL_OAUTH_CLIENT_ID:iqc-platform-local}
-            client-secret: ${IQC_GATEWAY_LOCAL_OAUTH_CLIENT_SECRET:base-gateway-local}
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: authorization_code
-            redirect-uri: ${IQC_GATEWAY_LOCAL_REDIRECT_URI:http://localhost:3010/login/oauth2/code/iqc-platform-local}
-            scope:
-              - read
-              - openid
-              - profile
-          iqc-platform:
-            provider: custom-issuer
-            client-name: IQC 线上前端
-            client-id: ${IQC_GATEWAY_ONLINE_OAUTH_CLIENT_ID:iqc-platform}
-            client-secret: ${IQC_GATEWAY_ONLINE_OAUTH_CLIENT_SECRET:}
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: authorization_code
-            redirect-uri: ${IQC_GATEWAY_ONLINE_REDIRECT_URI:http://opensabre:3010/login/oauth2/code/iqc-platform}
-            scope:
-              - read
-              - openid
-              - profile
 opensabre:
   gateway:
     # 网关白名单，无需要签权path
