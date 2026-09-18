@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: opensabre-applications
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["base-gateway:18080"]
+        labels:
+          application: base-gateway
+      - targets: ["base-gateway-admin:18080"]
+        labels:
+          application: base-gateway-admin
+      - targets: ["base-authorization:18080"]
+        labels:
+          application: base-authorization
+      - targets: ["base-organization:18080"]
+        labels:
+          application: base-organization
+      - targets: ["base-sysadmin:18080"]
+        labels:
+          application: base-sysadmin
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["127.0.0.1:9090"]

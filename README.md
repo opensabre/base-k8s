@@ -26,6 +26,7 @@ base-k8s/
     ├── bootstrap.yml                      # Spring Cloud bootstrap 覆盖配置
     ├── base-gateway-application.yml       # base-gateway 专用 application 覆盖配置
     ├── base-gateway.yml                   # base-gateway 专用 classpath 配置
+    ├── prometheus/prometheus.yml          # Prometheus 抓取配置
     └── application.yml                    # 通用 application 覆盖配置
 ```
 
@@ -144,6 +145,9 @@ docker compose -f docker-compose-apps.yml up -d
 | rnacos | 8848, 9848, 10848 | 同左 | 注册/配置中心，10848 为控制台 |
 | rabbitmq | 5672, 15672 | 同左 | MQ 与管理端 |
 | sentinel-dashboard | 8858 | 8858 | Sentinel 控制台（默认关闭，profile: sentinel） |
+| prometheus | 不映射 | 9090 | 运行指标时序库，仅 Docker 内网访问 |
+
+Prometheus 的部署、保留策略和验证方式见 [Prometheus 运行监控](docs/modules/prometheus-monitoring.md)。
 
 如果只想从网关访问后端服务，可以按安全策略移除 `8000/8010/8020/3306/6379` 等端口映射。
 
