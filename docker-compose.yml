@@ -307,6 +307,7 @@ services:
     environment:
       <<: *app-env
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?JASYPT_ENCRYPTOR_PASSWORD is required}
+      SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_METRICS_ENABLED: "true"
       SERVER_PORT: 8443
     ports:
       - "443:8443"

@@ -20,6 +20,9 @@ PromQL，`opensabre-admin` 负责图形化展示。浏览器不直接访问 Prom
 
 公共 Nacos 配置只为 `http.server.requests` 和 `spring.cloud.gateway.requests` 开启直方图，
 用于计算 P50/P95/P99。不得使用原始 URL、用户标识、请求参数等无界值作为指标标签。
+当前 Spring Cloud Gateway 5 的路由请求指标默认关闭，Compose 为网关显式设置
+`SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_METRICS_ENABLED=true`；发布后应经网关请求一条路由并
+确认 `spring_cloud_gateway_requests_seconds_bucket` 在 Prometheus 中出现。
 
 ## 运维验证
 
