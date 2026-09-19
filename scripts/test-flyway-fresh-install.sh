@@ -65,15 +65,21 @@ docker run -d --name "${mysql_container}" --network "${network}" \
   --collation-server=utf8mb4_unicode_ci >/dev/null
 
 ready=0
+stable_ready=0
 for _ in $(seq 1 60); do
   if docker exec "${mysql_container}" sh -c \
     'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -Nse "SELECT 1"' >/dev/null 2>&1; then
-    ready=1
-    break
+    ready=$((ready + 1))
+    if [[ ${ready} -ge 3 ]]; then
+      stable_ready=1
+      break
+    fi
+  else
+    ready=0
   fi
   sleep 2
 done
-if [[ ${ready} -ne 1 ]]; then
+if [[ ${stable_ready} -ne 1 ]]; then
   docker logs "${mysql_container}" >&2
   echo "ERROR: isolated MySQL did not become ready" >&2
   exit 1
@@ -86,12 +92,23 @@ for index in "${!services[@]}"; do
   password="migration_${run_id//-/_}_${index}_${RANDOM}"
   migration_dir="${workspace_root}/${service}/src/main/resources/db/migration/mysql"
 
-  printf '%s\n' \
-    "CREATE DATABASE \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" \
-    "CREATE USER '${user}'@'%' IDENTIFIED BY '${password}';" \
-    "GRANT ALL PRIVILEGES ON \`${database}\`.* TO '${user}'@'%';" \
-    | docker exec -i "${mysql_container}" sh -c \
-      'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" --default-character-set=utf8mb4'
+  created=0
+  for _ in $(seq 1 15); do
+    if printf '%s\n' \
+      "CREATE DATABASE \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" \
+      "CREATE USER '${user}'@'%' IDENTIFIED BY '${password}';" \
+      "GRANT ALL PRIVILEGES ON \`${database}\`.* TO '${user}'@'%';" \
+      | docker exec -i "${mysql_container}" sh -c \
+        'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" --default-character-set=utf8mb4'; then
+      created=1
+      break
+    fi
+    sleep 2
+  done
+  if [[ ${created} -ne 1 ]]; then
+    echo "ERROR ${service}: MySQL did not remain available while creating ${database}" >&2
+    exit 1
+  fi
 
   flyway=(docker run --rm --network "${network}"
     -v "${migration_dir}:/flyway/sql:ro"
