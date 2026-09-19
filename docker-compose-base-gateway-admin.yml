@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     mem_limit: ${BASE_GATEWAY_ADMIN_MEMORY_LIMIT:-768m}
     mem_reservation: ${BASE_GATEWAY_ADMIN_MEMORY_RESERVATION:-256m}
+    env_file:
+      - ./secrets/gateway-admin-actuator-oauth.env
     ports:
       - "8030:8030"
     environment:
@@ -23,6 +25,8 @@ services:
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?JASYPT_ENCRYPTOR_PASSWORD is required}
       GATEWAY_CONFIGURATION_WRITE_ENABLED: ${GATEWAY_CONFIGURATION_WRITE_ENABLED:-true}
       PROMETHEUS_URL: ${PROMETHEUS_URL:-http://prometheus:9090}
+      AUTH_TOKEN_URI: ${AUTH_TOKEN_URI:-http://base-authorization:8000/oauth2/token}
+      AUTH_JWK_SET_URI: ${AUTH_JWK_SET_URI:-http://base-authorization:8000/oauth2/jwks}
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -DJM.SNAPSHOT.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs/csp}
     volumes:
       - ./config/bootstrap.yml:/app/bootstrap.yml:ro
