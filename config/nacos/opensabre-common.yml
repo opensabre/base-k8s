@@ -9,7 +9,9 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          # 使用 Docker 服务名，避免容器内 localhost 回退。
+          # 校验令牌签发方必须使用授权服务实际写入 JWT 的 issuer。
+          # JWK 获取使用 Docker 服务名，不依赖外部 DNS。
+          issuer-uri: ${AUTH_ISSUER_URI:http://opensabre:8000}
           jwk-set-uri: http://base-authorization:8000/oauth2/jwks
 management:
   metrics:
