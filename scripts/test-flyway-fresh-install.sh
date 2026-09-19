@@ -147,6 +147,33 @@ for index in "${!services[@]}"; do
     echo "ERROR ${service}: schema/seed assertion failed (tables=${table_count}, seed=${seed_count})" >&2
     exit 1
   fi
+  if [[ "${service}" == base-sysadmin ]]; then
+    restored_seed_count="$(docker exec "${mysql_container}" mysql -u"${user}" -p"${password}" -D"${database}" -Nse \
+      "SELECT
+        (SELECT COUNT(*) FROM base_sys_captcha_scene WHERE id IN ('LOGIN_IMAGE','REGISTER_IMAGE','LOGIN_SMS','LOGIN_EMAIL')) +
+        (SELECT COUNT(*) FROM base_sys_notification_scene WHERE id IN ('NOTIFY_SCENE_LOGIN_CAPTCHA','NOTIFY_SCENE_ORDER_CREATED')) +
+        (SELECT COUNT(*) FROM base_sys_notification_template WHERE id IN ('NOTIFY_TPL_LOGIN_SMS','NOTIFY_TPL_LOGIN_EMAIL','NOTIFY_TPL_ORDER_SMS','NOTIFY_TPL_ORDER_EMAIL')) +
+        (SELECT COUNT(*) FROM base_sys_dict_type WHERE id IN ('DICT_GENDER','DICT_NOTICE_LEVEL','DICT_NOTICE_TYPE')) +
+        (SELECT COUNT(*) FROM base_sys_dict_item WHERE dict_code IN ('gender','notice_level','notice_type'))")"
+    if [[ "${restored_seed_count}" -ne 25 ]]; then
+      echo "ERROR ${service}: expected 25 restored controlled seed rows, found ${restored_seed_count}" >&2
+      exit 1
+    fi
+  fi
+  if [[ "${service}" == base-organization ]]; then
+    precise_audit_columns="$(docker exec "${mysql_container}" mysql -u"${user}" -p"${password}" -Nse \
+      "SELECT COUNT(*) FROM information_schema.columns
+       WHERE table_schema='${database}'
+         AND table_name IN ('base_org_group','base_org_position','base_org_menu','base_org_user_group',
+                            'base_org_user_position','base_org_role_menu','base_org_user','base_org_role',
+                            'base_org_resource','base_org_user_role','base_org_role_resource')
+         AND column_name IN ('created_time','updated_time')
+         AND data_type='datetime' AND datetime_precision=3")"
+    if [[ "${precise_audit_columns}" -ne 22 ]]; then
+      echo "ERROR ${service}: expected 22 millisecond-precision audit columns, found ${precise_audit_columns}" >&2
+      exit 1
+    fi
+  fi
   echo "PASS ${service}: ${first_count} migrations, ${table_count} tables, seed assertion, repeat run unchanged"
 done
 

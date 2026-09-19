@@ -14,6 +14,7 @@ services=(base-authorization base-organization base-sysadmin base-authorization 
 releases=(0.6 0.6 0.6 0.7 0.7 0.7)
 commits=(26e662f1876d45ed19860fc659c3d71dfa3f1ef3 217663b54f6d40645c3995b31d3c9fc99c4bac1d 5de60935c325cab8720b6eb7c7dd8291d83c7eb2 e4f9ab4dec45d1f1928a060c7e2c7072f9bfa12c 1b69c9d4ee19c888f174de41bf34974b73a285f9 ed5f31219867ddc65d6a2281fe5a5453ff3616f4)
 databases=(os_base_auth os_base_organization os_base_sysadmin os_base_auth os_base_organization os_base_sysadmin)
+# These paths are read from the pinned historical Git commits, not the current worktree.
 ddl_paths=(src/main/resources/db/os-base-auth-ddl.sql src/main/resources/db/os-base-org-ddl.sql src/main/resources/db/os-base-sysadmin-ddl.sql src/main/resources/db/os-base-auth-ddl.sql src/main/resources/db/os-base-org-ddl.sql src/main/resources/db/os-base-sysadmin-ddl.sql)
 baselines=(20260723.01 20260721.02 20260720.02 20260808.01 20260810.01 20260729.01)
 
