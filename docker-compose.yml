@@ -252,6 +252,7 @@ services:
     mem_reservation: ${BASE_ORGANIZATION_MEMORY_RESERVATION:-256m}
     environment:
       <<: *app-env
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${AUTH_ISSUER_URI:-http://opensabre:8000}
       # CI 镜像以非 root 用户运行，将 Nacos Client 日志写入已挂载的应用日志目录。
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs}
       SERVER_PORT: 8010
