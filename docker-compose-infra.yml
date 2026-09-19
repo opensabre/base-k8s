@@ -105,6 +105,7 @@ services:
       - --web.enable-lifecycle
     volumes:
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./secrets/prometheus-oauth-client-secret:/etc/prometheus/oauth-client-secret:ro
       - prometheus-data:/prometheus
     healthcheck:
       test: ["CMD", "promtool", "query", "instant", "http://127.0.0.1:9090", "up"]

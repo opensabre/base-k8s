@@ -5,6 +5,11 @@ global:
 scrape_configs:
   - job_name: opensabre-applications
     metrics_path: /actuator/prometheus
+    oauth2:
+      client_id: opensabre-prometheus
+      client_secret_file: /etc/prometheus/oauth-client-secret
+      scopes: [actuator.read]
+      token_url: http://base-authorization:8000/oauth2/token
     static_configs:
       - targets: ["base-gateway:18080"]
         labels:
