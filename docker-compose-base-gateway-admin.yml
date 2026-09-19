@@ -27,6 +27,7 @@ services:
       PROMETHEUS_URL: ${PROMETHEUS_URL:-http://prometheus:9090}
       AUTH_TOKEN_URI: ${AUTH_TOKEN_URI:-http://base-authorization:8000/oauth2/token}
       AUTH_JWK_SET_URI: ${AUTH_JWK_SET_URI:-http://base-authorization:8000/oauth2/jwks}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${AUTH_ISSUER_URI:-http://opensabre:8000}
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--DJM.LOG.PATH=/app/logs -DJM.SNAPSHOT.PATH=/app/logs -Dcsp.sentinel.log.dir=/app/logs/csp}
     volumes:
       - ./config/bootstrap.yml:/app/bootstrap.yml:ro
