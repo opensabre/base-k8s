@@ -153,14 +153,7 @@ Prometheus 的部署、保留策略和验证方式见 [Prometheus 运行监控](
 
 ## 数据库初始化
 
-MySQL 首次创建数据卷时会执行 `initdb/10-opensabre-init.sh`，该脚本按数据库显式执行：
-
-- `initdb/sql/base-authorization/os-base-auth-db.sql`
-- `initdb/sql/base-authorization/os-base-auth-ddl.sql`
-- `initdb/sql/base-organization/os-base-org-db.sql`
-- `initdb/sql/base-organization/os-base-org-ddl.sql`
-- `initdb/sql/base-sysadmin/os-base-sysadmin-db.sql`
-- `initdb/sql/base-sysadmin/os-base-sysadmin-ddl.sql`
+MySQL 首次创建数据卷时会执行 `initdb/10-opensabre-init.sh`，创建各服务数据库和限定权限的迁移账号。表结构及受控初始数据由各服务镜像中的 `src/main/resources/db/migration/mysql/` 管理。先运行独立 Flyway 迁移，再启动应用；操作顺序见 [数据库迁移](docs/database-migrations.md)。
 
 注意：MySQL 官方镜像只在数据目录为空时执行 `/docker-entrypoint-initdb.d`。如果需要重新初始化数据库，需要先备份数据，再删除 `mysql-data` 卷。
 
