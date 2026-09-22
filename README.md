@@ -203,6 +203,19 @@ GATEWAY_REDIRECT_URI=
 
 这两个值必须和浏览器可访问的服务器地址、认证服务签发地址一致。
 
+资源服务器的 JWT issuer 由 Nacos 公共配置 `opensabre-common.yml` 统一提供，应用 Compose
+不再逐个注入该属性。部署后必须核对 Nacos 的实际公共配置与真实 JWT 的 `iss`，并使用该
+JWT 调用当前用户接口：
+
+```bash
+cat /run/secrets/deployment-access-token | python3 scripts/verify_jwt_issuer_deployment.py \
+  --config-url 'http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=opensabre-common.yml&group=DEFAULT_GROUP&tenant=public' \
+  --token-stdin \
+  --current-user-url http://127.0.0.1:8010/user/current
+```
+
+脚本不会输出 token。公共配置与令牌 issuer 不一致或当前用户接口未返回 HTTP 200 时，部署验证失败。
+
 ### 修改 SQL 后没有重新执行
 
 MySQL 初始化脚本只在首次创建空数据卷时执行。开发/测试环境可删除数据卷后重启：
