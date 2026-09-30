@@ -26,6 +26,9 @@ scrape_configs:
       - targets: ["base-sysadmin:18080"]
         labels:
           application: base-sysadmin
+      - targets: ["iqc-platform:18080"]
+        labels:
+          application: iqc-platform
 
   - job_name: prometheus
     static_configs:
