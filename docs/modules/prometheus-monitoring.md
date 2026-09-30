@@ -9,10 +9,10 @@ PromQL，`opensabre-admin` 负责图形化展示。浏览器不直接访问 Prom
 - 应用管理端口 `18080` 只在 Docker 网络内可达。
 - 默认每 15 秒抓取一次，数据保留 30 天或 20 GB，以先达到者为准。
 - TSDB 使用 `prometheus-data` 命名卷，容器重建不会删除历史数据。
-- 首批目标为网关、网关控制面、授权、组织和系统管理服务。
-- `/actuator/**` 不允许匿名访问。固定的单项指标及密钥版本检查保留 OpenSabre
-  内部 Token；Prometheus 抓取及网关运行参数读取使用具有 `actuator.read` scope 的
-  OAuth2 client-credentials 令牌。Framework 不需要改动。
+- 采集目标包括网关、网关控制面、授权、组织、系统管理和 IQC 平台。
+- `/actuator/**` 不允许匿名访问。IQC 的 Prometheus 指标端点接受具有 `actuator.read` scope 的
+  OAuth2 client-credentials 令牌，并继续兼容 OpenSabre 内部监控 Token；密钥版本检查仍使用
+  内部 Token。网关运行参数读取也使用 `actuator.read` scope。Framework 不需要改动。
 - Prometheus 与网关控制面使用不同的 OAuth2 客户端，便于独立轮换和审计；凭据只保存在
   服务器 `secrets/` 目录，不进入 Git、Nacos 或 Prometheus 配置文件。
 
