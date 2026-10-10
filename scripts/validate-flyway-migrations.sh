@@ -10,6 +10,35 @@ else
 fi
 failed=0
 
+# Trigger bodies define future behavior; their DML does not execute during migration.
+# Recognize the explicit Flyway DELIMITER/block format, never a blanket file exemption.
+ddl_has_data_changes() {
+  awk '
+    BEGIN { delimiter=";"; trigger=0; bad=0 }
+    {
+      line=toupper($0)
+      sub(/^[[:space:]]+/, "", line)
+      sub(/[[:space:]]+$/, "", line)
+      if (line ~ /^DELIMITER[[:space:]]/) {
+        if (trigger) bad=1
+        split(line,parts,/[[:space:]]+/); delimiter=parts[2]
+        next
+      }
+      if (line ~ /^CREATE[[:space:]]+TRIGGER[[:space:]]/) {
+        if (trigger || delimiter==";") bad=1
+        trigger=1
+        next
+      }
+      if (trigger) {
+        if (line=="END" delimiter) trigger=0
+        next
+      }
+      if (line ~ /^(INSERT|UPDATE|DELETE|REPLACE|MERGE)[[:space:]]/) bad=1
+    }
+    END { exit (bad || trigger) ? 0 : 1 }
+  ' "$1"
+}
+
 for service in "${services[@]}"; do
   migration_dir="${workspace_root}/${service}/src/main/resources/db/migration/mysql"
   if [[ ! -d "${migration_dir}" ]]; then
@@ -75,7 +104,7 @@ for service in "${services[@]}"; do
       echo "ERROR ${service}: ${relative} may not switch, create, drop, or explicitly qualify an OpenSabre database" >&2
       failed=1
     fi
-    if [[ "${directory}" == ddl ]] && grep -Eni '^[[:space:]]*(INSERT|UPDATE|DELETE|REPLACE|MERGE)[[:space:]]' "${file}" >/dev/null; then
+    if [[ "${directory}" == ddl ]] && ddl_has_data_changes "${file}"; then
       echo "ERROR ${service}: DDL migration contains data-changing SQL: ${relative}" >&2
       failed=1
     fi
