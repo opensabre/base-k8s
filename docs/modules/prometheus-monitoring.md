@@ -16,6 +16,11 @@ PromQL，`opensabre-admin` 负责图形化展示。浏览器不直接访问 Prom
 - Prometheus 与网关控制面使用不同的 OAuth2 客户端，便于独立轮换和审计；凭据只保存在
   服务器 `secrets/` 目录，不进入 Git、Nacos 或 Prometheus 配置文件。
 
+监控专用 Access Token 有效期为 1 小时，Prometheus 和网关控制面各自缓存并在到期前
+重新申请。client-credentials 不使用 Refresh Token。两个客户端保留独立审计与密钥轮换边界，
+合并客户端不会让两个进程共享缓存。重新运行 provision 脚本会定向更新已有监控客户端的
+有效期，不轮换密钥、不修改其他客户端；已签发 Token 仍按原到期时间失效。
+
 ## 指标与基数
 
 公共 Nacos 配置只为 `http.server.requests` 和 `spring.cloud.gateway.requests` 开启直方图，
