@@ -3,6 +3,7 @@ import pathlib
 import re
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import bcrypt
 
@@ -14,6 +15,21 @@ SPEC.loader.exec_module(MODULE)
 
 
 class ProvisionActuatorOAuthClientsTest(unittest.TestCase):
+    def test_existing_client_updates_only_ttl_and_preserves_secret(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = pathlib.Path(temporary)
+            secret_file = directory / "prometheus-oauth-client-secret"
+            secret_file.write_text("existing-secret")
+            with patch.object(MODULE, "SECRET_DIR", directory), \
+                    patch.object(MODULE, "mysql", side_effect=["1", ""]) as mysql:
+                MODULE.provision("opensabre-prometheus", secret_file.name)
+            update = mysql.call_args.args[0]
+            self.assertIn("JSON_SET", update)
+            self.assertIn("3600", update)
+            self.assertIn("WHERE client_id = 'opensabre-prometheus' AND deleted = 'N'", update)
+            self.assertNotIn("client_secret", update)
+            self.assertEqual("existing-secret", secret_file.read_text())
+
     def test_provisions_scoped_client_without_storing_plaintext_in_sql(self):
         with tempfile.TemporaryDirectory() as temporary:
             MODULE.SECRET_DIR = pathlib.Path(temporary)
@@ -37,6 +53,7 @@ class ProvisionActuatorOAuthClientsTest(unittest.TestCase):
             self.assertNotIn(secret, insert)
             self.assertIn("'actuator.read'", insert)
             self.assertIn("'client_credentials'", insert)
+            self.assertIn('"settings.token.access-token-time-to-live":3600', insert)
             self.assertEqual((MODULE.SECRET_DIR / "prometheus-oauth-client-secret").stat().st_mode & 0o777,
                              0o600)
 

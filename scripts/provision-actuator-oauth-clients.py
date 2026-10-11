@@ -16,6 +16,7 @@ import bcrypt
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SECRET_DIR = ROOT / "secrets"
+ACCESS_TOKEN_TTL_SECONDS = 3600
 CLIENTS = (
     ("opensabre-prometheus", "prometheus-oauth-client-secret"),
     ("opensabre-actuator-control-plane", "gateway-admin-actuator-oauth.env"),
@@ -43,7 +44,14 @@ def provision(client_id: str, filename: str) -> None:
     if count != "0":
         if not path.is_file():
             raise RuntimeError(f"{client_id} exists, but {path} is missing")
-        print(f"{client_id}: already provisioned")
+        # Reconcile only the monitoring TTL; preserve credentials and all other settings.
+        mysql(
+            "UPDATE oauth2_registered_client SET token_settings = JSON_SET("
+            "token_settings, '$.\"settings.token.access-token-time-to-live\"', "
+            f"{ACCESS_TOKEN_TTL_SECONDS}), updated_time = NOW(3), updated_by = 'deployment' "
+            f"WHERE client_id = '{client_id}' AND deleted = 'N';"
+        )
+        print(f"{client_id}: token lifetime reconciled")
         return
     if path.exists():
         raise RuntimeError(f"{path} exists without a client record; inspect before retrying")
@@ -66,7 +74,7 @@ def provision(client_id: str, filename: str) -> None:
         "settings.client.require-authorization-consent": False,
     }, separators=(",", ":"))
     token_settings = json.dumps({
-        "settings.token.access-token-time-to-live": 300,
+        "settings.token.access-token-time-to-live": ACCESS_TOKEN_TTL_SECONDS,
         "settings.token.access-token-format": {"value": "self-contained"},
         "settings.token.refresh-token-time-to-live": 3600,
         "settings.token.reuse-refresh-tokens": True,
