@@ -11,7 +11,7 @@ fi
 failed=0
 
 # Trigger bodies define future behavior; their DML does not execute during migration.
-# Recognize the explicit Flyway DELIMITER/block format, never a blanket file exemption.
+# Recognize explicit blocks and single-statement SIGNAL triggers, never a blanket file exemption.
 ddl_has_data_changes() {
   awk '
     BEGIN { delimiter=";"; trigger=0; bad=0 }
@@ -25,8 +25,15 @@ ddl_has_data_changes() {
         next
       }
       if (line ~ /^CREATE[[:space:]]+TRIGGER[[:space:]]/) {
-        if (trigger || delimiter==";") bad=1
-        trigger=1
+        if (trigger) bad=1
+        trigger=(delimiter==";" ? 2 : 1)
+        next
+      }
+      if (trigger==2) {
+        # A SIGNAL-only body has exactly one terminator and cannot execute migration DML.
+        count=split(line,statements,";")
+        if (line !~ /^FOR[[:space:]]+EACH[[:space:]]+ROW[[:space:]]+SIGNAL[[:space:]]+SQLSTATE[[:space:]]/ || count!=2 || statements[2]!="") bad=1
+        trigger=0
         next
       }
       if (trigger) {
