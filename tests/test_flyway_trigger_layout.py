@@ -43,3 +43,19 @@ class TriggerLayoutTest(unittest.TestCase):
 
     def test_trigger_does_not_exempt_database_target_guard(self):
         self.check_layout(TRIGGER.replace("INSERT INTO action_event", "INSERT INTO `iqc_platform`.action_event"), False)
+
+    def test_single_statement_signal_trigger_is_schema_definition(self):
+        self.check_layout("CREATE TRIGGER guard_action BEFORE UPDATE ON action_ledger\n"
+                          "FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='immutable';\n", True)
+
+    def test_signal_trigger_does_not_hide_extra_or_unterminated_statements(self):
+        trigger = ("CREATE TRIGGER guard_action BEFORE UPDATE ON action_ledger\n"
+                   "FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='immutable';\n")
+        for suffix in ("INSERT INTO action_ledger VALUES (1);\n",
+                       "UPDATE action_ledger SET id=2;\n",
+                       "DELETE FROM action_ledger;\n"):
+            with self.subTest(suffix=suffix):
+                self.check_layout(trigger + suffix, False)
+        self.check_layout(trigger.rstrip().removesuffix(';') + "\n", False)
+        self.check_layout(trigger.replace("SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='immutable'",
+                                        "INSERT INTO action_ledger VALUES (1)"), False)
