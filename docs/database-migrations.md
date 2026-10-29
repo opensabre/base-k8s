@@ -101,3 +101,19 @@ applied to an unrecognized customer schema.
 
 Database rollback defaults to restore-from-backup or a new forward repair migration. Down migrations
 are not assumed to be safe for production DDL.
+
+### Trigger definitions in DDL migrations
+
+`validate-flyway-migrations.sh` recognizes the explicit Flyway block format
+`DELIMITER $$`, `CREATE TRIGGER ...`, `END$$`, `DELIMITER ;`. INSERT/UPDATE/DELETE
+inside that definition describe future trigger behavior rather than importing runtime
+rows. Top-level data changes before and after a trigger, incomplete definitions, and
+the existing cross-database ownership violations remain rejected. This bounded
+recognition is a layout check; actual SQL validity and transactional behavior still
+require isolated Flyway/MySQL acceptance. Inline or other routine formats are not
+added by this change.
+
+Run the validator regression with
+`python3 -m unittest discover -s tests -p test_flyway_trigger_layout.py`.
+
+校验器的数据库限定名正则使用单引号中的字面反引号，避免 BSD/GNU grep 对转义反引号的差异。触发器正文允许结构定义中的 DML，但跨库目标与顶层 DML 仍由独立回归拒绝；Linux 与 macOS 的六项回归均须通过。
