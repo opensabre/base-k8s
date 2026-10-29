@@ -35,6 +35,9 @@ jobs:
         with:
           repository: opensabre/iqc-platform
           path: iqc-platform
+      - name: Test trigger layout validation
+        working-directory: base-k8s
+        run: python3 -m unittest discover -s tests -p 'test_flyway_trigger_layout.py'
       - name: Validate migration ownership and naming
         run: base-k8s/scripts/validate-flyway-migrations.sh "$GITHUB_WORKSPACE"
       - name: Validate release database targets
