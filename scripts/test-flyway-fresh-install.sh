@@ -61,6 +61,7 @@ docker run -d --name "${mysql_container}" --network "${network}" \
   -e MYSQL_ROOT_PASSWORD="${root_password}" \
   -e MYSQL_ROOT_HOST=% \
   "${mysql_image}" \
+  --log-bin-trust-function-creators=1 \
   --character-set-server=utf8mb4 \
   --collation-server=utf8mb4_unicode_ci >/dev/null
 
