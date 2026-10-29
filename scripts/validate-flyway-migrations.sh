@@ -107,7 +107,8 @@ for service in "${services[@]}"; do
       fi
     fi
 
-    if grep -Eni '^[[:space:]]*(USE([[:space:]]|\`)|CREATE[[:space:]]+DATABASE|DROP[[:space:]]+DATABASE)|\`(os_base_[^\`]+|iqc_platform)\`[[:space:]]*\.' "${file}" >/dev/null; then
+    # Keep backticks literal: escaping them changes regex semantics in GNU grep.
+    if grep -Eni '^[[:space:]]*(USE([[:space:]]|`)|CREATE[[:space:]]+DATABASE|DROP[[:space:]]+DATABASE)|`(os_base_[^`]+|iqc_platform)`[[:space:]]*\.' "${file}" >/dev/null; then
       echo "ERROR ${service}: ${relative} may not switch, create, drop, or explicitly qualify an OpenSabre database" >&2
       failed=1
     fi

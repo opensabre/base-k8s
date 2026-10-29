@@ -115,3 +115,5 @@ added by this change.
 
 Run the validator regression with
 `python3 -m unittest discover -s tests -p test_flyway_trigger_layout.py`.
+
+校验器的数据库限定名正则使用单引号中的字面反引号，避免 BSD/GNU grep 对转义反引号的差异。触发器正文允许结构定义中的 DML，但跨库目标与顶层 DML 仍由独立回归拒绝；Linux 与 macOS 的六项回归均须通过。
