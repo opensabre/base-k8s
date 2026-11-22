@@ -56,3 +56,18 @@ GRANT ALL PRIVILEGES ON iqc_platform.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 EOSQL
 fi
+
+# Optional IAC extraction: this runtime identity cannot access IQC or change table structure.
+# Apply IAC-owned Flyway migrations separately using an administrative migration identity.
+if [[ -n "${IAC_DATASOURCE_USERNAME:-}" || -n "${IAC_DATASOURCE_PASSWORD:-}" ]]; then
+  iac_username="${IAC_DATASOURCE_USERNAME:?IAC_DATASOURCE_USERNAME is required}"
+  iac_password="${IAC_DATASOURCE_PASSWORD:?IAC_DATASOURCE_PASSWORD is required}"
+  [[ "$iac_username" =~ ^[a-zA-Z0-9_]{1,32}$ ]] || { echo "Invalid IAC username" >&2; exit 1; }
+  [[ "$iac_username" != root ]] || { echo "IAC requires a dedicated account" >&2; exit 1; }
+  [[ "$iac_password" != *[\\\'\"$'\n'$'\r']* ]] || { echo "Invalid IAC password characters" >&2; exit 1; }
+  "${mysql_root[@]}" <<EOSQL
+CREATE DATABASE IF NOT EXISTS iac_platform CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '${iac_username}'@'%' IDENTIFIED BY '${iac_password}';
+GRANT SELECT, INSERT, UPDATE, DELETE ON iac_platform.* TO '${iac_username}'@'%';
+EOSQL
+fi

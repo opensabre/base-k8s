@@ -1,0 +1,9 @@
+services:
+  iac-platform:
+    extra_hosts:
+      - "${GATEWAY_AUTH_HOST_ALIAS:?GATEWAY_AUTH_HOST_ALIAS is required}:${GATEWAY_AUTH_HOST_IP:?GATEWAY_AUTH_HOST_IP is required}"
+
+networks:
+  opensabre:
+    name: iqc-platform-hwy
+    external: true
