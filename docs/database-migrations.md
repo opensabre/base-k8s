@@ -117,3 +117,9 @@ Run the validator regression with
 `python3 -m unittest discover -s tests -p test_flyway_trigger_layout.py`.
 
 校验器的数据库限定名正则使用单引号中的字面反引号，避免 BSD/GNU grep 对转义反引号的差异。触发器正文允许结构定义中的 DML，但跨库目标与顶层 DML 仍由独立回归拒绝；Linux 与 macOS 的六项回归均须通过。
+
+### 隔离 MySQL 的触发器创建策略
+
+新装和旧版本升级测试的临时 MySQL 容器显式设置 `--log-bin-trust-function-creators=1`。MySQL 8 开启二进制日志时，未设置此项会在 schema-owner 执行合法 CREATE TRIGGER 时报告 1419，即使账号已拥有本 schema 的 TRIGGER 权限。测试继续使用原 schema-owner 的数据库级授权，不授予全局 SUPER，也不修改服务的迁移 SQL 或 checksum。
+
+该参数仅属于脚本创建并清理的测试容器，不修改现网 MySQL。生产迁移前需由数据库运维确认二进制日志与触发器创建策略；本脚本不自动更改生产全局变量或扩权应用账号。

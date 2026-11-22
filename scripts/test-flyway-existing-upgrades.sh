@@ -34,6 +34,7 @@ trap cleanup EXIT INT TERM
 docker network create "${network}" >/dev/null
 docker run -d --name "${mysql_container}" --network "${network}" --memory 768m --memory-swap 1g \
   -e MYSQL_ROOT_PASSWORD="${root_password}" -e MYSQL_ROOT_HOST=% "${mysql_image}" \
+  --log-bin-trust-function-creators=1 \
   --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci >/dev/null
 
 for _ in $(seq 1 60); do
